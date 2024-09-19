@@ -2,6 +2,7 @@
 CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -Werror -pedantic -Iinclude # TODO maybe change it according to project's task
 DEPFLAGS = -MMD -MP
+LIBS = -lpcap
 
 # Directories
 SRC_DIR = src
@@ -22,7 +23,7 @@ all: $(TARGET)
 
 # Rule to create the target executable
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LIBS)
 
 # Rule to create object files and generate dependencies
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
