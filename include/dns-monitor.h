@@ -9,6 +9,8 @@ class Dns_monitor {
 public:
     Dns_monitor(int argc, char** argv);
     
+    bool getIsConstructorErr() const;
+    
 private:
     Args m_args;
     bool m_is_constructor_err{};

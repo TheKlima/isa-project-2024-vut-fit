@@ -8,7 +8,10 @@ Dns_monitor::Dns_monitor(int argc, char **argv)
     m_pcap_handle{nullptr},
     m_dns_filter{"port 53"}
 {
-    
+    if(!createPcapHandle())
+    {
+        m_is_constructor_err = true;
+    }
 }
 
 // preparation before processing DNS packets
@@ -58,4 +61,9 @@ bool Dns_monitor::createPcapHandle()
 
     pcap_freecode(&bpf);
     return true;
+}
+
+bool Dns_monitor::getIsConstructorErr() const
+{
+    return m_is_constructor_err;
 }
