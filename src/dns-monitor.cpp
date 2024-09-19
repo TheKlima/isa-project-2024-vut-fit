@@ -67,3 +67,8 @@ bool Dns_monitor::getIsConstructorErr() const
 {
     return m_is_constructor_err;
 }
+
+void Dns_monitor::printErrBuff() const
+{
+    std::cerr << m_err_buff << std::endl;
+}

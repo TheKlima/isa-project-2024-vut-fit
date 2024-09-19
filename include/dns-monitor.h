@@ -4,12 +4,15 @@
 #include "args.h"
 #include <pcap/pcap.h>
 #include <cstring>
+#include <iostream>
 
 class Dns_monitor {
 public:
     Dns_monitor(int argc, char** argv);
+    void printErrBuff() const;
     
     bool getIsConstructorErr() const;
+    
     
 private:
     Args m_args;
