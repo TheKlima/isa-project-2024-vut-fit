@@ -1,3 +1,13 @@
+# My own stuff
+
+# CMake's generated stuff
+.idea
+cmake-build-debug
+CMakeLists.txt
+
+# Program's executable file
+dns_monitor
+
 # Prerequisites
 *.d
 
