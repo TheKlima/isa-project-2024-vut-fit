@@ -13,7 +13,12 @@ Args::Args(int argc, char** argv)
         switch(opt)
         {
             case 'i':
+                m_sniffing_from_interface = true;
+                m_packets_source = optarg;
+                break;
+                
             case 'r':
+                m_sniffing_from_interface = false;
                 m_packets_source = optarg;
                 break;
                 
@@ -35,4 +40,9 @@ const char* Args::getPacketsSource() const
 bool Args::getIsVerbose() const
 {
     return m_is_verbose;
+}
+
+bool Args::getSniffingFromInterface() const
+{
+    return m_sniffing_from_interface;
 }
