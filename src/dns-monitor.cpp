@@ -14,6 +14,14 @@ Dns_monitor::Dns_monitor(int argc, char **argv)
     }
 }
 
+Dns_monitor::~Dns_monitor()
+{
+    if(m_pcap_handle)
+    {
+        pcap_close(m_pcap_handle);
+    }
+}
+
 // preparation before processing DNS packets
 // inspired by: https://vichargrave.github.io/programming/develop-a-packet-sniffer-with-libpcap/#process-packets
 bool Dns_monitor::createPcapHandle()
