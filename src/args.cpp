@@ -1,4 +1,31 @@
 #include "args.h"
+#include "getopt.h"
+
+Args::Args(int argc, char** argv)
+    :
+    m_packets_source{nullptr},
+    m_is_verbose{false}
+{
+    int opt{};
+
+    while((opt = getopt(argc, argv, "i:r:v")) != -1)
+    {
+        switch(opt)
+        {
+            case 'i':
+            case 'r':
+                m_packets_source = optarg;
+                break;
+                
+            case 'v':
+                m_is_verbose = true;
+                break;
+                
+            default:
+                break;
+        }
+    }
+}
 
 const char* Args::getPacketsSource() const
 {
