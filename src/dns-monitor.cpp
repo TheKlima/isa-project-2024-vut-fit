@@ -6,7 +6,7 @@ Dns_monitor::Dns_monitor(int argc, char **argv)
     m_is_constructor_err{false},
     m_err_buff{0, },
     m_pcap_handle{nullptr},
-    m_dns_filter{"port 53"}
+    m_dns_filter{"udp port 53"}
 {
     if(!createPcapHandle())
     {
@@ -51,7 +51,7 @@ bool Dns_monitor::createPcapHandle()
     }
 
     struct bpf_program bpf{};
-
+    
     // convert the packet filter expression into a packet filter binary
     if(pcap_compile(m_pcap_handle, &bpf, m_dns_filter, 0, net_mask) == PCAP_ERROR)
     {
