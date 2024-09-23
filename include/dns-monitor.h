@@ -2,9 +2,12 @@
 #define DNS_MONITOR_H
 
 #include "args.h"
+#include "packet_writer.h"
 #include <pcap/pcap.h>
 #include <cstring>
 #include <iostream>
+#include <arpa/inet.h>
+#include <netinet/ip6.h>
 
 class Dns_monitor {
 public:
@@ -17,6 +20,7 @@ public:
     
 private:
     Args m_args;
+    Packet_writer* m_packet_writer;
     bool m_is_constructor_err{};
     char m_err_buff[PCAP_ERRBUF_SIZE]{};
     pcap_t* m_pcap_handle{};
