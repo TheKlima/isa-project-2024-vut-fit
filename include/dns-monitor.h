@@ -15,7 +15,7 @@ public:
     ~Dns_monitor();
     void printErrBuff() const;
     bool getIsConstructorErr() const;
-    bool run();
+    void run();
     
 private:
     Args m_args;

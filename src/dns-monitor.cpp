@@ -87,7 +87,7 @@ void Dns_monitor::printErrBuff() const
     std::cerr << m_err_buff << std::endl;
 }
 
-bool Dns_monitor::run()
+void Dns_monitor::run()
 {
     struct pcap_pkthdr* packet_header{nullptr};
     const u_char* packet_data{nullptr};
@@ -102,16 +102,13 @@ bool Dns_monitor::run()
         }
         else if(result == PCAP_ERROR_BREAK)
         {
-            break;
+            return;
         }
         else if(result != 1)
         {
-            strcpy(m_err_buff, "pcap_next_ex() error has occurred\n");
-            return false;
+            throw Dns_monitor_exception{"pcap_next_ex() error has occurred\n"};
         }
         
         m_packet_writer->printPacket(packet_header, packet_data);
     }
-    
-    return true;
 }
