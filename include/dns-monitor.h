@@ -25,10 +25,8 @@ private:
     char m_err_buff[PCAP_ERRBUF_SIZE]{};
     pcap_t* m_pcap_handle{};
     const char* const m_dns_filter{};
-
-
-
-    bool createPcapHandle();
+    
+    void createPcapHandle();
 };
 
 #endif // DNS_MONITOR_H

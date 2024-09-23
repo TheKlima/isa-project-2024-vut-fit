@@ -1,4 +1,5 @@
 #include "dns-monitor.h"
+#include "dns_monitor_exception.h"
 
 Dns_monitor::Dns_monitor(int argc, char **argv)
     :
@@ -35,7 +36,7 @@ Dns_monitor::~Dns_monitor()
 
 // preparation before processing DNS packets
 // inspired by: https://vichargrave.github.io/programming/develop-a-packet-sniffer-with-libpcap/#process-packets
-bool Dns_monitor::createPcapHandle()
+void Dns_monitor::createPcapHandle()
 {
     bpf_u_int32 net_mask{0};
     bpf_u_int32 src_ip{0};
@@ -45,7 +46,7 @@ bool Dns_monitor::createPcapHandle()
         // get network device source IP address and netmask
         if(pcap_lookupnet(m_args.getPacketsSource(), &src_ip, &net_mask, m_err_buff) == PCAP_ERROR)
         {
-            return false;
+            throw Dns_monitor_exception{std::string{"pcap_lookupnet(): "} + m_err_buff + '\n'};
         }
 
         // open the device for live capture
@@ -58,7 +59,7 @@ bool Dns_monitor::createPcapHandle()
     
     if(!m_pcap_handle)
     {
-        return false;
+        throw Dns_monitor_exception{std::string{"pcap_open_live(): "} + m_err_buff + '\n'};
     }
 
     struct bpf_program bpf{};
@@ -66,20 +67,17 @@ bool Dns_monitor::createPcapHandle()
     // convert the packet filter expression into a packet filter binary
     if(pcap_compile(m_pcap_handle, &bpf, m_dns_filter, 0, net_mask) == PCAP_ERROR)
     {
-        strcpy(m_err_buff, pcap_geterr(m_pcap_handle));
-        return false;
+        throw Dns_monitor_exception{std::string{"pcap_compile(): "} + pcap_geterr(m_pcap_handle) + '\n'};
     }
 
     // bind the packet filter to the libpcap handle
     if(pcap_setfilter(m_pcap_handle, &bpf) == PCAP_ERROR)
     {
-        strcpy(m_err_buff, pcap_geterr(m_pcap_handle));
         pcap_freecode(&bpf);
-        return false;
+        throw Dns_monitor_exception{std::string{"pcap_setfilter(): "} + pcap_geterr(m_pcap_handle) + '\n'};
     }
 
     pcap_freecode(&bpf);
-    return true;
 }
 
 bool Dns_monitor::getIsConstructorErr() const
@@ -95,7 +93,7 @@ void Dns_monitor::printErrBuff() const
 bool Dns_monitor::run()
 {
     struct pcap_pkthdr* packet_header{nullptr};
-    const u_char *packet_data{nullptr};
+    const u_char* packet_data{nullptr};
     
     while(true)
     {
