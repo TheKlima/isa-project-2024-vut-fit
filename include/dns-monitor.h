@@ -17,7 +17,6 @@ public:
     bool getIsConstructorErr() const;
     bool run();
     
-    
 private:
     Args m_args;
     Packet_writer* m_packet_writer;

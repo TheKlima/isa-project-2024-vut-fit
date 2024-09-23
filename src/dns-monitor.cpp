@@ -10,15 +10,12 @@ Dns_monitor::Dns_monitor(int argc, char **argv)
     m_pcap_handle{nullptr},
     m_dns_filter{"udp port 53"}
 {
-    if(!m_packet_writer || !createPcapHandle())
+    if(!m_packet_writer)
     {
-        if(!m_packet_writer)
-        {
-            strcpy(m_err_buff, "Error! operator 'new' has failed: couldn't allocate memory on heap for Packet_writer object.\n");
-        }
-        
-        m_is_constructor_err = true;
+        throw Dns_monitor_exception{"Error! operator 'new' has failed: couldn't allocate memory on heap for Packet_writer object.\n"};
     }
+    
+    createPcapHandle();
 }
 
 Dns_monitor::~Dns_monitor()
