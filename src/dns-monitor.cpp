@@ -105,7 +105,7 @@ void Dns_monitor::run()
         }
         else if(result != 1)
         {
-            throw Dns_monitor_exception{"pcap_next_ex() error has occurred"};
+            throw Dns_monitor_exception{"Error! pcap_next_ex() has failed."};
         }
         
         m_packet_writer->printPacket(packet_header, packet_data);
