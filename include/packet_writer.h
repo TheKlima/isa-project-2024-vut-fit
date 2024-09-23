@@ -11,6 +11,7 @@ public:
     
 private:
     bool printTimestamp(struct pcap_pkthdr* packet_header) const;
+    bool printIpAddress(const char* ip_address) const;
 };
 
 #endif // PACKET_WRITER_H

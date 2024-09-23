@@ -29,3 +29,8 @@ bool Packet_writer::printTimestamp(struct pcap_pkthdr* packet_header) const
     std::cout << timestamp_buffer;
     return true;
 }
+
+bool Packet_writer::printIpAddress(const char* ip_address) const
+{
+    std::cout << ip_address;
+}
