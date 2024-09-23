@@ -14,8 +14,8 @@ public:
     Dns_monitor(int argc, char** argv);
     ~Dns_monitor();
     void printErrBuff() const;
-    
     bool getIsConstructorErr() const;
+    bool run();
     
     
 private:

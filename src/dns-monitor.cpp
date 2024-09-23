@@ -49,7 +49,7 @@ bool Dns_monitor::createPcapHandle()
         }
 
         // open the device for live capture
-        m_pcap_handle = pcap_open_live(m_args.getPacketsSource(), BUFSIZ, 1, 300, m_err_buff);
+        m_pcap_handle = pcap_open_live(m_args.getPacketsSource(), BUFSIZ, 1, 100, m_err_buff);
     }
     else
     {
@@ -90,4 +90,33 @@ bool Dns_monitor::getIsConstructorErr() const
 void Dns_monitor::printErrBuff() const
 {
     std::cerr << m_err_buff << std::endl;
+}
+
+bool Dns_monitor::run()
+{
+    struct pcap_pkthdr* packet_header{nullptr};
+    const u_char *packet_data{nullptr};
+    
+    while(true)
+    {
+        int result{pcap_next_ex(m_pcap_handle, &packet_header, &packet_data)};
+        
+        if(result == 0)
+        {
+            continue;
+        }
+        else if(result == PCAP_ERROR_BREAK)
+        {
+            break;
+        }
+        else if(result != 1)
+        {
+            strcpy(m_err_buff, "pcap_next_ex() error has occurred\n");
+            return false;
+        }
+        
+        m_packet_writer->printPacket(packet_header, packet_data);
+    }
+    
+    return true;
 }
