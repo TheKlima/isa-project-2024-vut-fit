@@ -1,5 +1,4 @@
 #include "dns-monitor.h"
-#include "dns_monitor_exception.h"
 
 Dns_monitor::Dns_monitor(int argc, char **argv)
     :
@@ -43,7 +42,7 @@ void Dns_monitor::createPcapHandle()
         // get network device source IP address and netmask
         if(pcap_lookupnet(m_args.getPacketsSource(), &src_ip, &net_mask, m_err_buff) == PCAP_ERROR)
         {
-            throw Dns_monitor_exception{std::string{"pcap_lookupnet(): "} + m_err_buff + '\n'};
+            throw Dns_monitor_exception{std::string{"pcap_lookupnet(): "} + m_err_buff};
         }
 
         // open the device for live capture
@@ -56,7 +55,7 @@ void Dns_monitor::createPcapHandle()
     
     if(!m_pcap_handle)
     {
-        throw Dns_monitor_exception{std::string{"pcap_open_live(): "} + m_err_buff + '\n'};
+        throw Dns_monitor_exception{std::string{"pcap_open_live(): "} + m_err_buff};
     }
 
     struct bpf_program bpf{};
@@ -64,14 +63,14 @@ void Dns_monitor::createPcapHandle()
     // convert the packet filter expression into a packet filter binary
     if(pcap_compile(m_pcap_handle, &bpf, m_dns_filter, 0, net_mask) == PCAP_ERROR)
     {
-        throw Dns_monitor_exception{std::string{"pcap_compile(): "} + pcap_geterr(m_pcap_handle) + '\n'};
+        throw Dns_monitor_exception{std::string{"pcap_compile(): "} + pcap_geterr(m_pcap_handle)};
     }
 
     // bind the packet filter to the libpcap handle
     if(pcap_setfilter(m_pcap_handle, &bpf) == PCAP_ERROR)
     {
         pcap_freecode(&bpf);
-        throw Dns_monitor_exception{std::string{"pcap_setfilter(): "} + pcap_geterr(m_pcap_handle) + '\n'};
+        throw Dns_monitor_exception{std::string{"pcap_setfilter(): "} + pcap_geterr(m_pcap_handle)};
     }
 
     pcap_freecode(&bpf);
@@ -106,7 +105,7 @@ void Dns_monitor::run()
         }
         else if(result != 1)
         {
-            throw Dns_monitor_exception{"pcap_next_ex() error has occurred\n"};
+            throw Dns_monitor_exception{"pcap_next_ex() error has occurred"};
         }
         
         m_packet_writer->printPacket(packet_header, packet_data);
