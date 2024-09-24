@@ -11,3 +11,8 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     std::cout << " (" << std::flush;
     std::cout << ')' << std::endl;
 }
+
+void Simple_packet_writer::advancePtrToDnsHeader(const u_char** packet_data)
+{
+    *packet_data += ETHER_HDR_LEN + getIpHeaderSize(*packet_data) + 1;
+}

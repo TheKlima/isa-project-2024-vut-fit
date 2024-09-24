@@ -12,3 +12,8 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     std::cout << "\nSrcPort: UDP/" << std::flush;
     std::cout << "\n\n";
 }
+
+void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data)
+{
+    ++(*packet_data);
+}

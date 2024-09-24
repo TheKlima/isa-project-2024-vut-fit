@@ -21,7 +21,8 @@ protected:
     void printSrcIp() const;
     void printDstIp() const;
     int getIpHeaderSize(const u_char* packet_data) const;
-    
+    virtual void advancePtrToDnsHeader(const u_char** packet_data);
+
     bool m_is_ipv4{};
     char m_src_ip[INET6_ADDRSTRLEN]{};
     char m_dst_ip[INET6_ADDRSTRLEN]{};
