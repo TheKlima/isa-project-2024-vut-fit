@@ -88,3 +88,8 @@ void Packet_writer::printDstIp() const
 {
     std::cout << m_dst_ip << std::flush;
 }
+
+Packet_writer::~Packet_writer()
+{
+    
+}
