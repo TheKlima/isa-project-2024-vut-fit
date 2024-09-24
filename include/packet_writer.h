@@ -12,7 +12,7 @@ class Packet_writer {
 public:
     static Packet_writer* create(bool is_verbose);
     virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data) = 0;
-    virtual ~Packet_writer();
+    virtual ~Packet_writer() = default;
     
 protected:
     void printTimestamp(struct pcap_pkthdr* packet_header) const;

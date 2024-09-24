@@ -10,10 +10,10 @@ Packet_writer* Packet_writer::create(bool is_verbose)
 {
     if(is_verbose)
     {
-        return new(std::nothrow) Verbose_packet_writer;
+        return new Verbose_packet_writer;
     }
-
-    return new(std::nothrow) Simple_packet_writer;
+    
+    return new Simple_packet_writer;
 }
 
 void Packet_writer::printTimestamp(struct pcap_pkthdr* packet_header) const
@@ -87,9 +87,4 @@ void Packet_writer::printSrcIp() const
 void Packet_writer::printDstIp() const
 {
     std::cout << m_dst_ip << std::flush;
-}
-
-Packet_writer::~Packet_writer()
-{
-    
 }
