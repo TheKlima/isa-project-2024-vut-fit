@@ -17,3 +17,8 @@ void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data)
 {
     ++(*packet_data);
 }
+
+void Verbose_packet_writer::advancePtrToUdpHeader(const u_char** packet_data)
+{
+    *packet_data += ETHER_HDR_LEN + getIpHeaderSize(*packet_data);
+}

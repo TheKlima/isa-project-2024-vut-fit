@@ -9,6 +9,9 @@ public:
 
 protected:
     virtual void advancePtrToDnsHeader(const u_char** packet_data) override;
+    
+private:
+    void advancePtrToUdpHeader(const u_char** packet_data);
 
 };
 
