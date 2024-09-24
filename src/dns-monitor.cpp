@@ -1,6 +1,5 @@
 #include "dns-monitor.h"
 
-
 Dns_monitor::Dns_monitor(int argc, char **argv)
     :
     m_args{argc, argv},
@@ -75,7 +74,7 @@ void Dns_monitor::createPcapHandle()
     pcap_freecode(&bpf);
 }
 
-bool Dns_monitor::getIsConstructorErr() const // TODO remove me
+bool Dns_monitor::getIsConstructorErr() const
 {
     return m_is_constructor_err;
 }
