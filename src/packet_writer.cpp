@@ -6,7 +6,6 @@
 #include <netinet/ip6.h>
 #include <netinet/ip.h>
 
-
 Packet_writer* Packet_writer::create(bool is_verbose)
 {
     if(is_verbose)
@@ -79,4 +78,13 @@ void Packet_writer::getSrcDstIpAddresses(const void* src_ip, const void* dst_ip)
     {
         throw Dns_monitor_exception{"Error! inet_ntop() has failed."};
     }
+}
+
+void Packet_writer::printSrcIp() const
+{
+    std::cout << m_src_ip << std::flush;
+}
+void Packet_writer::printDstIp() const
+{
+    std::cout << m_dst_ip << std::flush;
 }
