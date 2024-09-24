@@ -69,3 +69,14 @@ void Packet_writer::processIpHeader(struct pcap_pkthdr* packet_header, const u_c
             throw Dns_monitor_exception{"Error! Unsupported link layer protocol: expecting only IPv4 or IPv6."};
     }
 }
+
+void Packet_writer::getSrcDstIpAddresses(const void* src_ip, const void* dst_ip)
+{
+    int address_family{m_is_ipv4 ? AF_INET : AF_INET6};
+
+    if(!inet_ntop(address_family, src_ip, m_src_ip, INET6_ADDRSTRLEN) ||
+       !inet_ntop(address_family, dst_ip, m_dst_ip, INET6_ADDRSTRLEN))
+    {
+        throw Dns_monitor_exception{"Error! inet_ntop() has failed."};
+    }
+}

@@ -21,6 +21,9 @@ protected:
     bool m_is_ipv4{};
     char m_src_ip[INET6_ADDRSTRLEN]{};
     char m_dst_ip[INET6_ADDRSTRLEN]{};
+
+private:
+    void getSrcDstIpAddresses(const void* src_ip, const void* dst_ip);
 };
 
 #endif // PACKET_WRITER_H
