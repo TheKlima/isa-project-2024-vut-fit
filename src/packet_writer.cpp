@@ -41,7 +41,7 @@ void Packet_writer::printIpAddress(const char* ip_address) const
     std::cout << ip_address << std::flush;
 }
 
-void Packet_writer::processIpHeader(struct pcap_pkthdr* packet_header, const u_char* packet_data)
+void Packet_writer::processIpHeader(const u_char* packet_data)
 {
     const struct ether_header* ethernet_header{reinterpret_cast<const struct ether_header*> (packet_data)};
 

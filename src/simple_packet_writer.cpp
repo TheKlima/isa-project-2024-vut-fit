@@ -4,7 +4,7 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
 {
     printTimestamp(packet_header);
     std::cout << ' ' << std::flush;
-    processIpHeader(packet_header, packet_data);
+    processIpHeader(packet_data);
     printSrcIp();
     std::cout << " -> " << std::flush;
     printDstIp();

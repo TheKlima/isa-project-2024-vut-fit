@@ -17,7 +17,7 @@ public:
 protected:
     void printTimestamp(struct pcap_pkthdr* packet_header) const;
     void printIpAddress(const char* ip_address) const;
-    void processIpHeader(struct pcap_pkthdr* packet_header, const u_char* packet_data);
+    void processIpHeader(const u_char* packet_data);
     void printSrcIp() const;
     void printDstIp() const;
     
