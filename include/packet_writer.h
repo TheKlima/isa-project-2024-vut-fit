@@ -16,7 +16,7 @@ public:
 protected:
     void printTimestamp(struct pcap_pkthdr* packet_header) const;
     void printIpAddress(const char* ip_address) const;
-    void getSrcDstIpAddresses(struct pcap_pkthdr* packet_header, const u_char* packet_data);
+    void processIpHeader(struct pcap_pkthdr* packet_header, const u_char* packet_data);
     
     bool m_is_ipv4{};
     char m_src_ip[INET6_ADDRSTRLEN]{};
