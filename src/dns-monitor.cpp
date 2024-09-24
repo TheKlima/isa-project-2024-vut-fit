@@ -8,13 +8,8 @@ Dns_monitor::Dns_monitor(int argc, char **argv)
     m_is_constructor_err{false},
     m_err_buff{0, },
     m_pcap_handle{nullptr},
-    m_dns_filter{"udp port 53"}
+    m_dns_filter{"bitchiamthebestonesexmoneydrugs"}
 {
-    if(!m_packet_writer)
-    {
-        throw Dns_monitor_exception{"Error! operator 'new' has failed: couldn't allocate memory on heap for Packet_writer object.\n"};
-    }
-    
     createPcapHandle();
 }
 
@@ -40,11 +35,12 @@ void Dns_monitor::createPcapHandle()
         // get network device source IP address and netmask
         if(pcap_lookupnet(m_args.getPacketsSource(), &src_ip, &net_mask, m_err_buff) == PCAP_ERROR)
         {
-            throw Dns_monitor_exception{std::string{"pcap_lookupnet(): "} + m_err_buff};
+            m_is_constructor_err = true;
+            return;
         }
 
         // open the device for live capture
-        m_pcap_handle = pcap_open_live(m_args.getPacketsSource(), BUFSIZ, 1, 100, m_err_buff);
+        m_pcap_handle = pcap_open_live(m_args.getPacketsSource(), BUFSIZ, 1, 0, m_err_buff);
     }
     else
     {
@@ -53,7 +49,8 @@ void Dns_monitor::createPcapHandle()
     
     if(!m_pcap_handle)
     {
-        throw Dns_monitor_exception{std::string{"pcap_open_live(): "} + m_err_buff};
+        m_is_constructor_err = true;
+        return;
     }
 
     struct bpf_program bpf{};
@@ -61,20 +58,24 @@ void Dns_monitor::createPcapHandle()
     // convert the packet filter expression into a packet filter binary
     if(pcap_compile(m_pcap_handle, &bpf, m_dns_filter, 0, net_mask) == PCAP_ERROR)
     {
-        throw Dns_monitor_exception{std::string{"pcap_compile(): "} + pcap_geterr(m_pcap_handle)};
+        m_is_constructor_err = true;
+        strcpy(m_err_buff, pcap_geterr(m_pcap_handle));
+        return;
     }
 
     // bind the packet filter to the libpcap handle
     if(pcap_setfilter(m_pcap_handle, &bpf) == PCAP_ERROR)
     {
         pcap_freecode(&bpf);
-        throw Dns_monitor_exception{std::string{"pcap_setfilter(): "} + pcap_geterr(m_pcap_handle)};
+        m_is_constructor_err = true;
+        strcpy(m_err_buff, pcap_geterr(m_pcap_handle));
+        return;
     }
 
     pcap_freecode(&bpf);
 }
 
-bool Dns_monitor::getIsConstructorErr() const
+bool Dns_monitor::getIsConstructorErr() const // TODO remove me
 {
     return m_is_constructor_err;
 }
@@ -107,7 +108,7 @@ void Dns_monitor::run()
         {
             throw Dns_monitor_exception{"Error! pcap_next_ex() has failed."};
         }
-        
+
         m_packet_writer->printPacket(packet_header, packet_data);
     }
 }
