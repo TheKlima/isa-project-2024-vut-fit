@@ -1,0 +1,11 @@
+#ifndef VERBOSE_PACKET_WRITER_H
+#define VERBOSE_PACKET_WRITER_H
+
+#include "packet_writer.h"
+
+class Verbose_packet_writer : public Packet_writer {
+public:
+    virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data) override;
+};
+
+#endif // VERBOSE_PACKET_WRITER_H
