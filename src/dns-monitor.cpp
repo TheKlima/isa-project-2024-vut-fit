@@ -39,7 +39,7 @@ void Dns_monitor::createPcapHandle()
         }
 
         // open the device for live capture
-        m_pcap_handle = pcap_open_live(m_args.getPacketsSource(), BUFSIZ, 1, 0, m_err_buff);
+        m_pcap_handle = pcap_open_live(m_args.getPacketsSource(), BUFSIZ, 1, 100, m_err_buff);
     }
     else
     {
