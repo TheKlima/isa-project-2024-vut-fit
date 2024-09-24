@@ -4,6 +4,8 @@
 #include "dns_monitor_exception.h"
 #include <new>                     // For std::nothrow
 #include <cstdlib>                 // For u_char
+#include <arpa/inet.h>             // For inet_ntop
+#include <netinet/ether.h>         // For Ethernet header (struct ether_header)
 #include <iostream>
 
 class Packet_writer {
@@ -14,6 +16,11 @@ public:
 protected:
     void printTimestamp(struct pcap_pkthdr* packet_header) const;
     void printIpAddress(const char* ip_address) const;
+    void getSrcDstIpAddresses(struct pcap_pkthdr* packet_header, const u_char* packet_data);
+    
+    bool m_is_ipv4{};
+    char m_src_ip[INET6_ADDRSTRLEN]{};
+    char m_dst_ip[INET6_ADDRSTRLEN]{};
 };
 
 #endif // PACKET_WRITER_H
