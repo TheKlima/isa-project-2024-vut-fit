@@ -1,5 +1,6 @@
 #include "dns-monitor.h"
 
+
 Dns_monitor::Dns_monitor(int argc, char **argv)
     :
     m_args{argc, argv},
@@ -87,6 +88,8 @@ void Dns_monitor::run()
 {
     struct pcap_pkthdr* packet_header{nullptr};
     const u_char* packet_data{nullptr};
+
+    signal(SIGINT, sigintHandler);
     
     while(true)
     {
@@ -107,4 +110,10 @@ void Dns_monitor::run()
         
         m_packet_writer->printPacket(packet_header, packet_data);
     }
+}
+
+void Dns_monitor::sigintHandler(int sig)
+{
+    (void)sig;
+    throw Dns_monitor_exception{""};
 }

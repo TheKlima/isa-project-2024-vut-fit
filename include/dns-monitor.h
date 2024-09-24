@@ -9,6 +9,7 @@
 #include <iostream>
 #include <arpa/inet.h>
 #include <netinet/ip6.h>
+#include <csignal>
 
 class Dns_monitor {
 public:
@@ -17,6 +18,7 @@ public:
     void printErrBuff() const;
     bool getIsConstructorErr() const;
     void run();
+    static void sigintHandler(int sig);
     
 private:
     Args m_args;
