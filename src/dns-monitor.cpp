@@ -19,10 +19,7 @@ Dns_monitor::Dns_monitor(int argc, char **argv)
 
 Dns_monitor::~Dns_monitor()
 {
-    if(m_packet_writer)
-    {
-        delete m_packet_writer;
-    }
+    delete m_packet_writer;
     
     if(m_pcap_handle)
     {
