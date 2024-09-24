@@ -4,5 +4,10 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
 {
     std::cout << "Timestamp: " << std::flush;
     printTimestamp(packet_header);
-    std::cout << std::endl;
+    std::cout << "\nSrcIP: " << std::flush;
+    printSrcIp();
+    std::cout << "\nDstIP: " << std::flush;
+    printDstIp();
+    std::cout << "\nSrcPort: UDP/" << std::flush;
+    std::cout << "\n\n";
 }
