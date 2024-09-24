@@ -7,7 +7,7 @@ Dns_monitor::Dns_monitor(int argc, char **argv)
     m_is_constructor_err{false},
     m_err_buff{0, },
     m_pcap_handle{nullptr},
-    m_dns_filter{"bitchiamthebestonesexmoneydrugs"}
+    m_dns_filter{"udp port 53"}
 {
     createPcapHandle();
 }
