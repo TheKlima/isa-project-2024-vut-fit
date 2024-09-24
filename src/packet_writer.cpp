@@ -48,19 +48,23 @@ void Packet_writer::processIpHeader(struct pcap_pkthdr* packet_header, const u_c
 
     uint16_t ethernet_type = ntohs(ethernet_header->ether_type);
 
+    const struct ip* ipv4_header{nullptr};
+    const struct ip6_hdr* ipv6_header{nullptr};
+
     switch(ethernet_type)
     {
         case ETHERTYPE_IP:
             m_is_ipv4 = true;
-            const struct ip* ipv4_header{reinterpret_cast<const struct ip*> (packet_data + ETHER_HDR_LEN)};
+            ipv4_header = reinterpret_cast<const struct ip*> (packet_data + ETHER_HDR_LEN);
             getSrcDstIpAddresses(&(ipv4_header->ip_src), &(ipv4_header->ip_dst));
             return;
             
         case ETHERTYPE_IPV6:
             m_is_ipv4 = false;
-            const struct ip6_hdr* ipv6_header{reinterpret_cast<const struct ip6_hdr*> (packet_data + ETHER_HDR_LEN)};
+            ipv6_header = reinterpret_cast<const struct ip6_hdr*> (packet_data + ETHER_HDR_LEN);
             getSrcDstIpAddresses(&(ipv6_header->ip6_src), &(ipv6_header->ip6_dst));
             return;
+            
         default:
             throw Dns_monitor_exception{"Error! Unsupported link layer protocol: expecting only IPv4 or IPv6."};
     }
