@@ -11,6 +11,8 @@ public:
     
 private:
     const char* m_packets_source{};
+    const char* m_domains_file_name{};
+    const char* m_translations_file_name{};
     bool m_is_verbose{};
     bool m_sniffing_from_interface{};
 };
