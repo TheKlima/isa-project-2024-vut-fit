@@ -43,6 +43,16 @@ const char* Args::getPacketsSource() const
     return m_packets_source;
 }
 
+const char* Args::getDomainsFileName() const
+{
+    return m_domains_file_name;
+}
+
+const char* Args::getTranslationsFileName() const
+{
+    return m_translations_file_name;
+}
+
 bool Args::getIsVerbose() const
 {
     return m_is_verbose;

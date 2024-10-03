@@ -6,6 +6,8 @@ public:
     Args(int argc, char** argv);
     
     const char* getPacketsSource() const;
+    const char* getDomainsFileName() const;
+    const char* getTranslationsFileName() const;
     bool getIsVerbose() const;
     bool getSniffingFromInterface() const;
     
