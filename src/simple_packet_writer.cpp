@@ -4,10 +4,7 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
 {
     printTimestamp(getTimestamp(packet_header));
     std::cout << ' ' << std::flush;              // TODO make a function from it
-    processIpHeader(packet_data);
-    printSrcIp();
-    std::cout << " -> " << std::flush;
-    printDstIp();
+    printSrcDstIpAddresses();
     std::cout << " (" << std::flush;
     std::cout << ')' << std::endl;
 }
@@ -20,4 +17,9 @@ void Simple_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) con
 void Simple_packet_writer::printTimestamp(std::string_view timestamp) const
 {
     std::cout << timestamp << std::flush;
+}
+
+void Simple_packet_writer::printSrcDstIpAddresses() const
+{
+    std::cout << m_src_ip << " -> " << m_dst_ip << std::flush;
 }

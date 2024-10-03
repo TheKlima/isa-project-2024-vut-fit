@@ -10,6 +10,7 @@ public:
 protected:
     virtual void advancePtrToDnsHeader(const u_char** packet_data) const override;
     virtual void printTimestamp(std::string_view timestamp) const override;
+    virtual void printSrcDstIpAddresses() const override;
     
 private:
     void advancePtrToUdpHeader(const u_char** packet_data) const;

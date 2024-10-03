@@ -5,10 +5,7 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
 {
     printTimestamp(getTimestamp(packet_header));
     processIpHeader(packet_data);
-    std::cout << "\nSrcIP: " << std::flush;
-    printSrcIp();
-    std::cout << "\nDstIP: " << std::flush;
-    printDstIp();
+    printSrcDstIpAddresses();
     advancePtrToUdpHeader(&packet_data);
     processUdpHeader(packet_data);
     advancePtrToDnsHeader(&packet_data);
@@ -27,6 +24,11 @@ void Verbose_packet_writer::advancePtrToUdpHeader(const u_char** packet_data) co
 void Verbose_packet_writer::printTimestamp(std::string_view timestamp) const
 {
     std::cout << "Timestamp: " << timestamp << std::endl;
+}
+
+void Verbose_packet_writer::printSrcDstIpAddresses() const
+{
+    std::cout << "SrcIP: " << m_src_ip << "\nDstIP: " << m_dst_ip << std::endl;
 }
 
 void Verbose_packet_writer::processUdpHeader(const u_char* packet_data) const
