@@ -16,7 +16,7 @@ Packet_writer* Packet_writer::create(bool is_verbose)
     return new Simple_packet_writer;
 }
 
-void Packet_writer::printTimestamp(struct pcap_pkthdr* packet_header) const
+std::string Packet_writer::getTimestamp(struct pcap_pkthdr* packet_header) const
 {
     struct tm* local_time{localtime(&(packet_header->ts.tv_sec))};
 
@@ -28,7 +28,7 @@ void Packet_writer::printTimestamp(struct pcap_pkthdr* packet_header) const
     char timestamp_buffer[20]{0, };
     strftime(timestamp_buffer, sizeof(timestamp_buffer), "%Y-%m-%d %H:%M:%S", local_time);
     
-    std::cout << timestamp_buffer << std::flush;
+    return std::string{timestamp_buffer};
 }
 
 void Packet_writer::printIpAddress(const char* ip_address) const

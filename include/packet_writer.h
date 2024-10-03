@@ -15,13 +15,13 @@ public:
     virtual ~Packet_writer() = default;
     
 protected:
-    void printTimestamp(struct pcap_pkthdr* packet_header) const;
+    std::string getTimestamp(struct pcap_pkthdr* packet_header) const;
     void printIpAddress(const char* ip_address) const;
     void processIpHeader(const u_char* packet_data);
     void printSrcIp() const;
     void printDstIp() const;
     int getIpHeaderSize(const u_char* packet_data) const;
-    virtual void advancePtrToDnsHeader(const u_char** packet_data);
+    virtual void advancePtrToDnsHeader(const u_char** packet_data) const = 0;
 
     bool m_is_ipv4{};
     char m_src_ip[INET6_ADDRSTRLEN]{};
