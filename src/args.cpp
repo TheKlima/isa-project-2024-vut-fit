@@ -4,22 +4,28 @@
 Args::Args(int argc, char** argv)
     :
     m_packets_source{nullptr},
+    m_domains_file_name{nullptr},
+    m_translations_file_name{nullptr},
     m_is_verbose{false}
 {
     int opt{};
 
-    while((opt = getopt(argc, argv, "i:r:v")) != -1)
+    while((opt = getopt(argc, argv, "i:p:d:t:v")) != -1)
     {
         switch(opt)
         {
             case 'i':
-                m_sniffing_from_interface = true;
+            case 'p':
+                m_sniffing_from_interface = (opt == 'i');
                 m_packets_source = optarg;
                 break;
                 
-            case 'r':
-                m_sniffing_from_interface = false;
-                m_packets_source = optarg;
+            case 'd':
+                m_domains_file_name = optarg;
+                break;
+                
+            case 't':
+                m_translations_file_name = optarg;
                 break;
                 
             case 'v':
