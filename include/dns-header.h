@@ -2,6 +2,7 @@
 #define DNS_HEADER_H
 
 #include <cstdint>
+#include <cstring>
 
 class __attribute__((packed)) Dns_header {
 private:
@@ -20,6 +21,9 @@ private:
     uint16_t m_ancount{};
     uint16_t m_nscount{};
     uint16_t m_arcount{};
+    
+public:
+    void create(const u_char* dns_header);
 };
 
 #endif // DNS_HEADER_H
