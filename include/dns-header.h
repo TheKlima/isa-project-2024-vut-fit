@@ -24,6 +24,22 @@ private:
     
 public:
     void create(const u_char* dns_header);
+
+    uint16_t getId() const;
+    uint16_t getQr() const;
+    uint16_t getOpcode() const;
+    uint16_t getAa() const;
+    uint16_t getTc() const;
+    uint16_t getRd() const;
+    uint16_t getRa() const;
+    uint16_t getZ() const;
+    uint16_t getAd() const;
+    uint16_t getCd() const;
+    uint16_t getRcode() const;
+    uint16_t getQdcount() const;
+    uint16_t getAncount() const;
+    uint16_t getNscount() const;
+    uint16_t getArcount() const;
 };
 
 #endif // DNS_HEADER_H
