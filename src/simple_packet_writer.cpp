@@ -30,5 +30,5 @@ void Simple_packet_writer::printSrcDstIpAddresses() const
 void Simple_packet_writer::printDnsHeader() const
 {
     std::cout << "(" << (dns_header.getQr() ? 'R' : 'Q') << ' ' << dns_header.getQdcount() << '/'
-    << dns_header.getAncount() << ' ' << dns_header.getNscount() << '/' << dns_header.getArcount() << ')' << std::endl;
+    << dns_header.getAncount() << '/' << dns_header.getNscount() << '/' << dns_header.getArcount() << ')' << std::endl;
 }
