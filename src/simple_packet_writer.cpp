@@ -8,7 +8,7 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     printSrcDstIpAddresses();
     std::cout << ' ' << std::flush;
     advancePtrToDnsHeader(&packet_data);
-    dns_header.create(packet_data);
+    dns_header.fill(packet_data);
     printDnsHeader();
 }
 

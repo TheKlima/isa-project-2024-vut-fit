@@ -9,7 +9,7 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     advancePtrToUdpHeader(&packet_data);
     printSrcDstUdpPorts(reinterpret_cast<const struct udphdr*> (packet_data));
     advancePtrToDnsHeader(&packet_data);
-    dns_header.create(packet_data);
+    dns_header.fill(packet_data);
     printDnsHeader();
 }
 
@@ -40,8 +40,8 @@ void Verbose_packet_writer::printSrcDstUdpPorts(const struct udphdr* udp_header)
 
 void Verbose_packet_writer::printDnsHeader() const
 {
-    std::cout << "Flags:  QR=" << dns_header.getQr() << ", OPCODE=" << dns_header.getOpcode() << ", AA=" <<
-    dns_header.getAa() << ", TC=" << dns_header.getTc() << ", RD=" << dns_header.getRd() << "RA=" << dns_header.getRa()
+    std::cout << "Flags: QR=" << dns_header.getQr() << ", OPCODE=" << dns_header.getOpcode() << ", AA=" <<
+    dns_header.getAa() << ", TC=" << dns_header.getTc() << ", RD=" << dns_header.getRd() << ", RA=" << dns_header.getRa()
     << ", AD=" << dns_header.getAd() << ", CD=" << dns_header.getCd() << ", RCODE=" << dns_header.getRcode()
     << '\n' << std::endl;
 }

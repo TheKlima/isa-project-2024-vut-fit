@@ -4,27 +4,42 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <netinet/in.h>
 
-class __attribute__((packed)) Dns_header {
+class Dns_header {
 private:
     uint16_t m_id{};
-    uint16_t m_qr : 1 {};
-    uint16_t m_opcode : 4 {};
-    uint16_t m_aa : 1 {};
-    uint16_t m_tc : 1 {};
-    uint16_t m_rd : 1 {};
-    uint16_t m_ra : 1 {};
-    uint16_t m_z : 1 {};
-    uint16_t m_ad : 1 {};
-    uint16_t m_cd : 1 {};
-    uint16_t m_rcode : 4 {};
+    uint8_t m_qr{};
+    uint8_t m_opcode{};
+    uint8_t m_aa{};
+    uint8_t m_tc{};
+    uint8_t m_rd{};
+    uint8_t m_ra{};
+    uint8_t m_ad{};
+    uint8_t m_cd{};
+    uint8_t m_rcode{};
     uint16_t m_qdcount{};
     uint16_t m_ancount{};
     uint16_t m_nscount{};
     uint16_t m_arcount{};
+
+    void setId(uint16_t id);
+    void setQr(uint8_t qr);
+    void setOpcode(uint8_t opcode);
+    void setAa(uint8_t aa);
+    void setTc(uint8_t tc);
+    void setRd(uint8_t rd);
+    void setRa(uint8_t ra);
+    void setAd(uint8_t ad);
+    void setCd(uint8_t cd);
+    void setRcode(uint8_t rcode);
+    void setQdcount(uint16_t qdcount);
+    void setAncount(uint16_t ancount);
+    void setNscount(uint16_t nscount);
+    void setArcount(uint16_t arcount);
     
 public:
-    void create(const u_char* dns_header);
+    void fill(const u_char* dns_header);
 
     uint16_t getId() const;
     uint16_t getQr() const;
@@ -33,7 +48,6 @@ public:
     uint16_t getTc() const;
     uint16_t getRd() const;
     uint16_t getRa() const;
-    uint16_t getZ() const;
     uint16_t getAd() const;
     uint16_t getCd() const;
     uint16_t getRcode() const;
