@@ -40,7 +40,8 @@ void Verbose_packet_writer::printSrcDstUdpPorts(const struct udphdr* udp_header)
 
 void Verbose_packet_writer::printDnsHeader() const
 {
-    std::cout << "Flags: QR=" << dns_header.getQr() << ", OPCODE=" << dns_header.getOpcode() << ", AA=" <<
+    std::cout << "Identifier: 0x" << std::hex << std::uppercase << std::setw(4) << std::setfill('0') << dns_header.getId()
+    << std::dec << "\nFlags: QR=" << dns_header.getQr() << ", OPCODE=" << dns_header.getOpcode() << ", AA=" <<
     dns_header.getAa() << ", TC=" << dns_header.getTc() << ", RD=" << dns_header.getRd() << ", RA=" << dns_header.getRa()
     << ", AD=" << dns_header.getAd() << ", CD=" << dns_header.getCd() << ", RCODE=" << dns_header.getRcode()
     << '\n' << std::endl;

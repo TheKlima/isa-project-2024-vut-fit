@@ -2,6 +2,7 @@
 #define VERBOSE_PACKET_WRITER_H
 
 #include "packet_writer.h"
+#include <iomanip>  // for std::setw and std::setfill
 
 class Verbose_packet_writer : public Packet_writer {
 public:
