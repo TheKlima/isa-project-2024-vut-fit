@@ -15,7 +15,7 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
 
 void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const
 {
-    ++(*packet_data);
+    (*packet_data) += UDP_HEADER_SIZE;
 }
 
 void Verbose_packet_writer::advancePtrToUdpHeader(const u_char** packet_data) const

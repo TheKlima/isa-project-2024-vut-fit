@@ -14,7 +14,7 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
 
 void Simple_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const
 {
-    (*packet_data) += ETHER_HDR_LEN + getIpHeaderSize(*packet_data) + 8;
+    (*packet_data) += ETHER_HDR_LEN + getIpHeaderSize(*packet_data) + UDP_HEADER_SIZE;
 }
 
 void Simple_packet_writer::printTimestamp(std::string_view timestamp) const

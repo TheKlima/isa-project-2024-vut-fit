@@ -15,6 +15,8 @@ public:
     virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data) = 0;
     virtual ~Packet_writer() = default;
     
+    static constexpr int UDP_HEADER_SIZE{8};
+    
 protected:
     std::string getTimestamp(struct pcap_pkthdr* packet_header) const;
     void printIpAddress(const char* ip_address) const;
