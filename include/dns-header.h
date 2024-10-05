@@ -2,6 +2,7 @@
 #define DNS_HEADER_H
 
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 
 class __attribute__((packed)) Dns_header {

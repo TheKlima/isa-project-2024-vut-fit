@@ -7,8 +7,10 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     processIpHeader(packet_data);
     printSrcDstIpAddresses();
     advancePtrToUdpHeader(&packet_data);
-    processUdpHeader(packet_data);
+    printSrcDstUdpPorts(reinterpret_cast<const struct udphdr*> (packet_data));
     advancePtrToDnsHeader(&packet_data);
+    dns_header.create(packet_data);
+    printDnsHeader();
 }
 
 void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const
@@ -31,11 +33,15 @@ void Verbose_packet_writer::printSrcDstIpAddresses() const
     std::cout << "SrcIP: " << m_src_ip << "\nDstIP: " << m_dst_ip << std::endl;
 }
 
-void Verbose_packet_writer::processUdpHeader(const u_char* packet_data) const
+void Verbose_packet_writer::printSrcDstUdpPorts(const struct udphdr* udp_header) const
 {
-    const struct udphdr* udp_header{reinterpret_cast<const struct udphdr*> (packet_data)};
-    std::cout << "\nSrcPort: UDP/" << ntohs(udp_header->source) << "\nDstPort: UDP/" <<  std::flush;
-//    printPortNumber(ntohs(udp_header->source));
-//    std::cout << "\nDstPort: UDP/" << std::flush;
-//    printPortNumber(ntohs(udp_header->dest));
+    std::cout << "SrcPort: UDP/" << ntohs(udp_header->source) << "\nDstPort: UDP/" << ntohs(udp_header->dest) << std::endl;
+}
+
+void Verbose_packet_writer::printDnsHeader() const
+{
+    std::cout << "Flags:  QR=" << dns_header.getQr() << ", OPCODE=" << dns_header.getOpcode() << ", AA=" <<
+    dns_header.getAa() << ", TC=" << dns_header.getTc() << ", RD=" << dns_header.getRd() << "RA=" << dns_header.getRa()
+    << ", AD=" << dns_header.getAd() << ", CD=" << dns_header.getCd() << ", RCODE=" << dns_header.getRcode()
+    << '\n' << std::endl;
 }

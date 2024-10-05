@@ -2,6 +2,7 @@
 #define PACKET_WRITER_H
 
 #include "dns_monitor_exception.h"
+#include "dns-header.h"
 #include <new>                     // For std::nothrow
 #include <cstdlib>                 // For u_char
 #include <arpa/inet.h>             // For inet_ntop
@@ -24,10 +25,12 @@ protected:
     virtual void advancePtrToDnsHeader(const u_char** packet_data) const = 0;
     virtual void printTimestamp(std::string_view timestamp) const = 0;
     virtual void printSrcDstIpAddresses() const = 0;
+    virtual void printDnsHeader() const = 0;
 
     bool m_is_ipv4{};
     char m_src_ip[INET6_ADDRSTRLEN]{};
     char m_dst_ip[INET6_ADDRSTRLEN]{};
+    Dns_header dns_header;
 
 private:
     void getSrcDstIpAddresses(const void* src_ip, const void* dst_ip);

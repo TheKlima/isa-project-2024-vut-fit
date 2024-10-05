@@ -1,4 +1,5 @@
 #include "dns-header.h"
+#include <iostream>
 
 void Dns_header::create(const u_char* dns_header)
 {

@@ -11,10 +11,11 @@ protected:
     virtual void advancePtrToDnsHeader(const u_char** packet_data) const override;
     virtual void printTimestamp(std::string_view timestamp) const override;
     virtual void printSrcDstIpAddresses() const override;
+    virtual void printDnsHeader() const override;
     
 private:
     void advancePtrToUdpHeader(const u_char** packet_data) const;
-    void processUdpHeader(const u_char* packet_data) const;
+    void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
 
 };
 

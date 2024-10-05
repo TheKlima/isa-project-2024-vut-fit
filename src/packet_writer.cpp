@@ -93,7 +93,7 @@ int Packet_writer::getIpHeaderSize(const u_char* packet_data) const
 {
     if(m_is_ipv4)
     {
-        return (reinterpret_cast<const struct ip*> (packet_data + ETHER_HDR_LEN)->ip_hl * 4);
+        return ((reinterpret_cast<const struct ip*> (packet_data + ETHER_HDR_LEN))->ip_hl * 4);
     }
     
     return sizeof(struct ip6_hdr);
