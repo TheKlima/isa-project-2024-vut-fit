@@ -89,7 +89,9 @@ void Dns_monitor::run()
     struct pcap_pkthdr* packet_header{nullptr};
     const u_char* packet_data{nullptr};
 
-    signal(SIGINT, sigintHandler);
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+    signal(SIGQUIT, signalHandler);
     
     while(true)
     {
@@ -112,7 +114,7 @@ void Dns_monitor::run()
     }
 }
 
-void Dns_monitor::sigintHandler(int sig)
+void Dns_monitor::signalHandler(int sig)
 {
     (void)sig;
     throw Dns_monitor_exception{""};

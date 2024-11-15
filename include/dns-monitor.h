@@ -18,7 +18,7 @@ public:
     void printErrBuff() const;
     bool getIsConstructorErr() const;
     void run();
-    static void sigintHandler(int sig);
+    static void signalHandler(int sig);
     
 private:
     Args m_args;
