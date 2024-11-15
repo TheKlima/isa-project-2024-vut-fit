@@ -133,17 +133,3 @@ void Dns_monitor::signalHandler(int sig)
     (void)sig;
     throw Dns_monitor_exception{""};
 }
-
-//void Dns_monitor::createOutputFile(std::ofstream output_file, const char* const file_name)
-//{
-//    if(file_name)
-//    {
-//        output_file.open(file_name);
-//
-//        if(!output_file)
-//        {
-//            strcpy(m_err_buff, "Error! Couldn't create an output file.\n");
-//            m_is_constructor_err = true;
-//        }
-//    }
-//}

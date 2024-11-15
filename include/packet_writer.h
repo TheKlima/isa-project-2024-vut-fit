@@ -22,11 +22,12 @@ public:
 protected:
     Packet_writer(const char* domains_file_name, const char* translations_file_name);
     std::string getTimestamp(struct pcap_pkthdr* packet_header) const;
+    int getIpHeaderSize(const u_char* packet_data) const;
     void printIpAddress(const char* ip_address) const;
     void processIpHeader(const u_char* packet_data);
     void printSrcIp() const;
     void printDstIp() const;
-    int getIpHeaderSize(const u_char* packet_data) const;
+    std::string getQuestionDomainName(const u_char** packet_data) const;
     virtual void advancePtrToDnsHeader(const u_char** packet_data) const = 0;
     virtual void printTimestamp(std::string_view timestamp) const = 0;
     virtual void printSrcDstIpAddresses() const = 0;

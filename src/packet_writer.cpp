@@ -6,6 +6,26 @@
 #include <netinet/ip6.h>
 #include <netinet/ip.h>
 
+std::string Packet_writer::getQuestionDomainName(const u_char** packet_data) const
+{
+    std::string domain_name{};
+
+    while(**packet_data != '\0')
+    {
+        uint8_t label_length{**packet_data};
+        ++(*packet_data);
+        
+        domain_name.append(reinterpret_cast<const char*>(*packet_data), label_length);
+        domain_name.push_back('.');
+        (*packet_data) += label_length;
+    }
+
+    domain_name.push_back('.');
+    (*packet_data)++;
+    
+    return domain_name;
+}
+
 bool Packet_writer::getIsConstructorErr() const
 {
     return m_is_constructor_err;
