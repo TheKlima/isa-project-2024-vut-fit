@@ -3,12 +3,26 @@
 Dns_monitor::Dns_monitor(int argc, char **argv)
     :
     m_args{argc, argv},
-    m_packet_writer{Packet_writer::create(m_args.getIsVerbose())},
+    m_packet_writer{Packet_writer::create(m_args.getIsVerbose(), m_args.getDomainsFileName(), m_args.getTranslationsFileName())},
     m_is_constructor_err{false},
     m_err_buff{0, },
     m_pcap_handle{nullptr},
     m_dns_filter{"udp port 53"}
 {
+    if(!m_packet_writer)
+    {
+        strcpy(m_err_buff, "Error! Couldn't allocate memory for packet writer.\n");
+        m_is_constructor_err = true;
+        return;
+    }
+    
+    if(m_packet_writer->getIsConstructorErr())
+    {
+        strcpy(m_err_buff, "Error! Couldn't create/open output file.\n");
+        m_is_constructor_err = true;
+        return;
+    }
+    
     createPcapHandle();
 }
 
@@ -119,3 +133,17 @@ void Dns_monitor::signalHandler(int sig)
     (void)sig;
     throw Dns_monitor_exception{""};
 }
+
+//void Dns_monitor::createOutputFile(std::ofstream output_file, const char* const file_name)
+//{
+//    if(file_name)
+//    {
+//        output_file.open(file_name);
+//
+//        if(!output_file)
+//        {
+//            strcpy(m_err_buff, "Error! Couldn't create an output file.\n");
+//            m_is_constructor_err = true;
+//        }
+//    }
+//}

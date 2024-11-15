@@ -6,14 +6,54 @@
 #include <netinet/ip6.h>
 #include <netinet/ip.h>
 
-Packet_writer* Packet_writer::create(bool is_verbose)
+bool Packet_writer::getIsConstructorErr() const
+{
+    return m_is_constructor_err;
+}
+
+Packet_writer::Packet_writer(const char* domains_file_name, const char* translations_file_name)
+    :
+    m_is_constructor_err{false}
+{
+    createOutputFile(m_domains_file, domains_file_name);
+    createOutputFile(m_translations_file, translations_file_name);
+    
+    if(!m_domains_file || !m_translations_file)
+    {
+        m_is_constructor_err = true;
+    }
+}
+
+void Packet_writer::closeOutputFile(std::ofstream& output_file)
+{
+    if(output_file.is_open())
+    {
+        output_file.close();
+    }
+}
+
+Packet_writer::~Packet_writer()
+{
+    closeOutputFile(m_domains_file);
+    closeOutputFile(m_translations_file);
+}
+
+void Packet_writer::createOutputFile(std::ofstream& output_file, const char* file_name)
+{
+    if(file_name)
+    {
+        output_file.open(file_name);
+    }
+}
+
+Packet_writer* Packet_writer::create(bool is_verbose, const char* domains_file_name, const char* translations_file_name)
 {
     if(is_verbose)
     {
-        return new Verbose_packet_writer;
+        return new Verbose_packet_writer{domains_file_name, translations_file_name};
     }
-    
-    return new Simple_packet_writer;
+
+    return new Simple_packet_writer{domains_file_name, translations_file_name};
 }
 
 std::string Packet_writer::getTimestamp(struct pcap_pkthdr* packet_header) const

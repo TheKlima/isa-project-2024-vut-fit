@@ -1,5 +1,12 @@
 #include "simple_packet_writer.h"
 
+Simple_packet_writer::Simple_packet_writer(const char* domains_file_name, const char* translations_file_name)
+    :
+    Packet_writer(domains_file_name, translations_file_name)
+{
+    
+}
+
 void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data)
 {
     printTimestamp(getTimestamp(packet_header));
@@ -8,7 +15,7 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     printSrcDstIpAddresses();
     std::cout << ' ' << std::flush;
     advancePtrToDnsHeader(&packet_data);
-    dns_header.fill(packet_data);
+    m_dns_header.fill(packet_data);
     printDnsHeader();
 }
 
@@ -29,6 +36,6 @@ void Simple_packet_writer::printSrcDstIpAddresses() const
 
 void Simple_packet_writer::printDnsHeader() const
 {
-    std::cout << "(" << (dns_header.getQr() ? 'R' : 'Q') << ' ' << dns_header.getQdcount() << '/'
-    << dns_header.getAncount() << '/' << dns_header.getNscount() << '/' << dns_header.getArcount() << ')' << std::endl;
+    std::cout << "(" << (m_dns_header.getQr() ? 'R' : 'Q') << ' ' << m_dns_header.getQdcount() << '/'
+    << m_dns_header.getAncount() << '/' << m_dns_header.getNscount() << '/' << m_dns_header.getArcount() << ')' << std::endl;
 }

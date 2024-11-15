@@ -1,6 +1,13 @@
 #include "verbose_packet_writer.h"
 #include <netinet/udp.h>
 
+Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, const char* translations_file_name)
+        :
+        Packet_writer(domains_file_name, translations_file_name)
+{
+
+}
+
 void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data)
 {
     printTimestamp(getTimestamp(packet_header));
@@ -9,7 +16,7 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     advancePtrToUdpHeader(&packet_data);
     printSrcDstUdpPorts(reinterpret_cast<const struct udphdr*> (packet_data));
     advancePtrToDnsHeader(&packet_data);
-    dns_header.fill(packet_data);
+    m_dns_header.fill(packet_data);
     printDnsHeader();
 }
 
@@ -40,9 +47,9 @@ void Verbose_packet_writer::printSrcDstUdpPorts(const struct udphdr* udp_header)
 
 void Verbose_packet_writer::printDnsHeader() const
 {
-    std::cout << "Identifier: 0x" << std::hex << std::uppercase << std::setw(4) << std::setfill('0') << dns_header.getId()
-    << std::dec << "\nFlags: QR=" << dns_header.getQr() << ", OPCODE=" << dns_header.getOpcode() << ", AA=" <<
-    dns_header.getAa() << ", TC=" << dns_header.getTc() << ", RD=" << dns_header.getRd() << ", RA=" << dns_header.getRa()
-    << ", AD=" << dns_header.getAd() << ", CD=" << dns_header.getCd() << ", RCODE=" << dns_header.getRcode()
+    std::cout << "Identifier: 0x" << std::hex << std::uppercase << std::setw(4) << std::setfill('0') << m_dns_header.getId()
+    << std::dec << "\nFlags: QR=" << m_dns_header.getQr() << ", OPCODE=" << m_dns_header.getOpcode() << ", AA=" <<
+    m_dns_header.getAa() << ", TC=" << m_dns_header.getTc() << ", RD=" << m_dns_header.getRd() << ", RA=" << m_dns_header.getRa()
+    << ", AD=" << m_dns_header.getAd() << ", CD=" << m_dns_header.getCd() << ", RCODE=" << m_dns_header.getRcode()
     << '\n' << std::endl;
 }

@@ -6,6 +6,7 @@
 
 class Verbose_packet_writer : public Packet_writer {
 public:
+    Verbose_packet_writer(const char* domains_file_name, const char* translations_file_name);
     virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data) override;
 
 protected:
