@@ -6,7 +6,8 @@
 class Simple_packet_writer : public Packet_writer {
 public:
     Simple_packet_writer(const char* domains_file_name, const char* translations_file_name);
-    virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data) override;
+    virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
+                             bool is_translations_file) override;
     
 protected:
     virtual void advancePtrToDnsHeader(const u_char** packet_data) const override;

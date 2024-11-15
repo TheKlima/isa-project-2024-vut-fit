@@ -13,7 +13,8 @@
 class Packet_writer {
 public:
     static Packet_writer* create(bool is_verbose, const char* domains_file_name, const char* translations_file_name);
-    virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data) = 0;
+    virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
+            bool is_translations_file) = 0;
     virtual ~Packet_writer();
     bool getIsConstructorErr() const;
     

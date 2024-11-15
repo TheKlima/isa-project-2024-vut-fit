@@ -8,7 +8,8 @@ Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, cons
 
 }
 
-void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data)
+void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
+                                        bool is_translations_file)
 {
     printTimestamp(getTimestamp(packet_header));
     processIpHeader(packet_data);

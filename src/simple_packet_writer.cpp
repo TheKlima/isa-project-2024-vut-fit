@@ -7,7 +7,8 @@ Simple_packet_writer::Simple_packet_writer(const char* domains_file_name, const 
     
 }
 
-void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data)
+void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
+                                       bool is_translations_file)
 {
     printTimestamp(getTimestamp(packet_header));
     std::cout << ' ' << std::flush;              // TODO make a function from it
