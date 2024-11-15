@@ -28,14 +28,14 @@ protected:
     int getIpHeaderSize(const u_char* packet_data) const;
     void printIpAddress(const char* ip_address) const;
     void processIpHeader(const u_char* packet_data);
-    void processDomainName(std::string& domain_name, std::vector<std::string> known_domains);
+    void processDomainName(std::string& domain_name, std::vector<std::string>& known_domains);
     void printSrcIp() const;
     void printDstIp() const;
     virtual void advancePtrToDnsHeader(const u_char** packet_data) const = 0;
     virtual void printTimestamp(std::string_view timestamp) const = 0;
     virtual void printSrcDstIpAddresses() const = 0;
     virtual void printDnsHeader() const = 0;
-    virtual void processDnsQuestion() const = 0;
+    virtual void processDnsQuestion(const u_char** packet_data) = 0;
 
     bool m_is_ipv4{};
     char m_src_ip[INET6_ADDRSTRLEN]{};
@@ -46,6 +46,7 @@ protected:
     std::ofstream m_translations_file{};
 
     bool m_is_constructor_err{};
+    std::vector<std::string> known_domains{};
 
 private:
     void getSrcDstIpAddresses(const void* src_ip, const void* dst_ip);

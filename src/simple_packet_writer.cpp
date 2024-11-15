@@ -7,6 +7,17 @@ Simple_packet_writer::Simple_packet_writer(const char* domains_file_name, const 
     
 }
 
+void Simple_packet_writer::skipDnsQuestion(const u_char** packet_data) const
+{
+    while(**packet_data != '\0')
+    {
+        uint8_t label_length{**packet_data};
+        (*packet_data) += 1 + label_length;
+    }
+    
+    (*packet_data) += 5;
+}
+
 void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
                                        bool is_translations_file)
 {
@@ -18,16 +29,22 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     advancePtrToDnsHeader(&packet_data);
     m_dns_header.fill(packet_data);
     printDnsHeader();
-    
+
     if(is_domains_file)
     {
-        std::string question_domain_name{getQuestionDomainName(&packet_data)};
+        processDnsQuestion(&packet_data);
+    }
+    else
+    {
+        skipDnsQuestion(&packet_data);
     }
 }
 
-void Simple_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const
+void Simple_packet_writer::processDnsQuestion(const u_char** packet_data)
 {
-    (*packet_data) += ETHER_HDR_LEN + getIpHeaderSize(*packet_data) + UDP_HEADER_SIZE;
+    std::string domain_name{getQuestionDomainName(packet_data)};
+    processDomainName(domain_name, known_domains);
+    (*packet_data) += 4;
 }
 
 void Simple_packet_writer::printTimestamp(std::string_view timestamp) const

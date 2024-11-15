@@ -14,6 +14,10 @@ protected:
     virtual void printTimestamp(std::string_view timestamp) const override;
     virtual void printSrcDstIpAddresses() const override;
     virtual void printDnsHeader() const override;
+    virtual void processDnsQuestion(const u_char** packet_data) override;
+    
+private:
+    void skipDnsQuestion(const u_char** packet_data) const;
 };
 
 #endif // SIMPLE_PACKET_WRITER_H
