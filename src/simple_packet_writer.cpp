@@ -18,6 +18,11 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     advancePtrToDnsHeader(&packet_data);
     m_dns_header.fill(packet_data);
     printDnsHeader();
+    
+    if(is_domains_file)
+    {
+        std::string question_domain_name{getQuestionDomainName(&packet_data)};
+    }
 }
 
 void Simple_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const

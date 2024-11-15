@@ -6,6 +6,19 @@
 #include <netinet/ip6.h>
 #include <netinet/ip.h>
 
+void Packet_writer::processDomainName(std::string& domain_name, std::vector<std::string> known_domains)
+{
+    for(const auto& i : known_domains)
+    {
+        if(domain_name.find(i) != std::string::npos)
+        {
+            return;
+        }
+    }
+    
+    m_domains_file << domain_name << std::endl;
+}
+
 std::string Packet_writer::getQuestionDomainName(const u_char** packet_data) const
 {
     std::string domain_name{};
@@ -20,7 +33,7 @@ std::string Packet_writer::getQuestionDomainName(const u_char** packet_data) con
         (*packet_data) += label_length;
     }
 
-    domain_name.push_back('.');
+//    domain_name.push_back('.');
     (*packet_data)++;
     
     return domain_name;
