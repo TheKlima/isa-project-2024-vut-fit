@@ -15,10 +15,22 @@ protected:
     virtual void printTimestamp(std::string_view timestamp) const override;
     virtual void printSrcDstIpAddresses() const override;
     virtual void printDnsHeader() const override;
+    virtual void processDnsQuestion(const u_char** packet_data) override;
     
 private:
     void advancePtrToUdpHeader(const u_char** packet_data) const;
     void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
+    bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
+    
+    enum class Dns_record_type {
+        A = 1,
+        NS = 2,
+        CNAME = 5,
+        SOA = 6,
+        MX = 15,
+        AAAA = 28,
+        SRV = 33
+    };
 
 };
 

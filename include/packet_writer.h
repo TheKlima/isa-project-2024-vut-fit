@@ -28,7 +28,7 @@ protected:
     int getIpHeaderSize(const u_char* packet_data) const;
     void printIpAddress(const char* ip_address) const;
     void processIpHeader(const u_char* packet_data);
-    void processDomainName(std::string& domain_name, std::vector<std::string>& known_domains);
+    void processDomainName(std::string& domain_name);
     void printSrcIp() const;
     void printDstIp() const;
     virtual void advancePtrToDnsHeader(const u_char** packet_data) const = 0;
@@ -46,7 +46,7 @@ protected:
     std::ofstream m_translations_file{};
 
     bool m_is_constructor_err{};
-    std::vector<std::string> known_domains{};
+    std::vector<std::string> m_known_domains{};
 
 private:
     void getSrcDstIpAddresses(const void* src_ip, const void* dst_ip);

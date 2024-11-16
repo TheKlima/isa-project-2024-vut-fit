@@ -8,6 +8,39 @@ Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, cons
 
 }
 
+bool Verbose_packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type) const
+{
+    switch (dns_record_type)
+    {
+        case static_cast<uint16_t> (Dns_record_type::A):
+        case static_cast<uint16_t> (Dns_record_type::NS):
+        case static_cast<uint16_t> (Dns_record_type::CNAME):
+        case static_cast<uint16_t> (Dns_record_type::SOA):
+        case static_cast<uint16_t> (Dns_record_type::MX):
+        case static_cast<uint16_t> (Dns_record_type::AAAA):
+        case static_cast<uint16_t> (Dns_record_type::SRV):
+            return true;
+            
+        default:
+            return false;
+    }
+}
+
+void Verbose_packet_writer::processDnsQuestion(const u_char **packet_data)
+{
+    std::string domain_name{getQuestionDomainName(packet_data)};
+    processDomainName(domain_name);
+
+    uint16_t qtype = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
+    (*packet_data) += 2;
+
+    uint16_t qclass = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
+    (*packet_data) += 2;
+
+//    std::cout << "[Question Section]" << std::endl;
+
+}
+
 void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
                                         bool is_translations_file)
 {
@@ -19,6 +52,7 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     advancePtrToDnsHeader(&packet_data);
     m_dns_header.fill(packet_data);
     printDnsHeader();
+    processDnsQuestion(&packet_data);
 }
 
 void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const

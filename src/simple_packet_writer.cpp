@@ -43,7 +43,7 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
 void Simple_packet_writer::processDnsQuestion(const u_char** packet_data)
 {
     std::string domain_name{getQuestionDomainName(packet_data)};
-    processDomainName(domain_name, known_domains);
+    processDomainName(domain_name);
     (*packet_data) += 4;
 }
 
