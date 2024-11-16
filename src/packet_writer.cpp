@@ -20,24 +20,31 @@ void Packet_writer::processDomainName(std::string& domain_name)
     m_known_domains.push_back(domain_name);
 }
 
+void Packet_writer::advancePtrToDnsQuestion(const u_char** packet_data) const
+{
+    (*packet_data) += 12;
+}
+
 std::string Packet_writer::getQuestionDomainName(const u_char** packet_data) const
 {
     std::string domain_name{};
 
-    while(**packet_data != '\0')
+    while(true)
     {
         uint8_t label_length{**packet_data};
         ++(*packet_data);
         
         domain_name.append(reinterpret_cast<const char*>(*packet_data), label_length);
-        domain_name.push_back('.');
         (*packet_data) += label_length;
-    }
+        
+        if(**packet_data == '\0')
+        {
+            ++(*packet_data);
+            return domain_name;
+        }
 
-//    domain_name.push_back('.');
-    (*packet_data)++;
-    
-    return domain_name;
+        domain_name.push_back('.');
+    }
 }
 
 bool Packet_writer::getIsConstructorErr() const

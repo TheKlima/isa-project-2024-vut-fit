@@ -15,7 +15,7 @@ protected:
     virtual void printTimestamp(std::string_view timestamp) const override;
     virtual void printSrcDstIpAddresses() const override;
     virtual void printDnsHeader() const override;
-    virtual void processDnsQuestion(const u_char** packet_data) override;
+    virtual void processDnsQuestion(const u_char** packet_data, bool is_domains_file) override;
     
 private:
     enum class Dns_record_type {
@@ -31,9 +31,10 @@ private:
 
     void advancePtrToUdpHeader(const u_char** packet_data) const;
     void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
-    bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
     void printDnsRecordType(Dns_record_type dns_record_type) const;
     void printDnsSectionsDelimiter() const;
+    bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
+    bool isSupportedDnsClass(uint16_t dns_class) const;
 };
 
 #endif // VERBOSE_PACKET_WRITER_H

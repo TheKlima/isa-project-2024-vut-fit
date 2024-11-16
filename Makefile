@@ -35,8 +35,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 # Clean up
 clean:
-	rm dns_monitor
 	rm -rf $(OBJ_DIR)
+	rm dns_monitor
 
 # Phony targets
 .PHONY: all clean
