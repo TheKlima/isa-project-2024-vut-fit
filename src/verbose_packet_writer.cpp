@@ -8,6 +8,28 @@ Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, cons
 
 }
 
+void Verbose_packet_writer::printDnsRecordType(Dns_record_type dns_record_type) const
+{
+    switch (dns_record_type)
+    {
+        case Dns_record_type::A:
+            std::cout << "A";
+        case Dns_record_type::NS:
+            std::cout << "NS";
+        case Dns_record_type::CNAME:
+            std::cout << "CNAME";
+        case Dns_record_type::SOA:
+            std::cout << "SOA";
+        case Dns_record_type::MX:
+            std::cout << "MX";
+        case Dns_record_type::AAAA:
+            std::cout << "AAAA";
+
+        default: // SRV
+        std::cout << "SRV";
+    }
+}
+
 bool Verbose_packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type) const
 {
     switch (dns_record_type)
@@ -36,6 +58,17 @@ void Verbose_packet_writer::processDnsQuestion(const u_char **packet_data)
 
     uint16_t qclass = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
     (*packet_data) += 2;
+    
+    if(!isSupportedDnsRecordType(qtype))
+    {
+        return;
+    }
+    
+    // TODO check IN
+    
+    std::cout << domain_name << ' ';
+    // TODO print IN
+    printDnsRecordType(static_cast<Dns_record_type> (qtype));
 
 //    std::cout << "[Question Section]" << std::endl;
 

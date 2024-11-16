@@ -18,10 +18,6 @@ protected:
     virtual void processDnsQuestion(const u_char** packet_data) override;
     
 private:
-    void advancePtrToUdpHeader(const u_char** packet_data) const;
-    void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
-    bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
-    
     enum class Dns_record_type {
         A = 1,
         NS = 2,
@@ -32,6 +28,11 @@ private:
         SRV = 33
     };
 
+
+    void advancePtrToUdpHeader(const u_char** packet_data) const;
+    void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
+    bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
+    void printDnsRecordType(Dns_record_type dns_record_type) const;
 };
 
 #endif // VERBOSE_PACKET_WRITER_H
