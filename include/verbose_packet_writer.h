@@ -33,6 +33,7 @@ private:
     void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
     bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
     void printDnsRecordType(Dns_record_type dns_record_type) const;
+    void printDnsSectionsDelimiter() const;
 };
 
 #endif // VERBOSE_PACKET_WRITER_H

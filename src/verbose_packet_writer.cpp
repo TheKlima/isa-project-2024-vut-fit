@@ -8,6 +8,11 @@ Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, cons
 
 }
 
+void Verbose_packet_writer::printDnsSectionsDelimiter() const
+{
+    std::cout << "====================" << std::endl;
+}
+
 void Verbose_packet_writer::printDnsRecordType(Dns_record_type dns_record_type) const
 {
     switch (dns_record_type)
@@ -66,12 +71,11 @@ void Verbose_packet_writer::processDnsQuestion(const u_char **packet_data)
     
     // TODO check IN
     
-    std::cout << domain_name << ' ';
+    std::cout << "[Question Section]" << std::endl << domain_name << ' ';
     // TODO print IN
     printDnsRecordType(static_cast<Dns_record_type> (qtype));
-
-//    std::cout << "[Question Section]" << std::endl;
-
+    std::cout << '\n';
+    printDnsSectionsDelimiter();
 }
 
 void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
