@@ -9,7 +9,7 @@
 #include <netinet/ether.h>         // For Ethernet header (struct ether_header)
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <set>
 
 class Packet_writer {
 public:
@@ -47,7 +47,7 @@ protected:
     std::ofstream m_translations_file{};
 
     bool m_is_constructor_err{};
-    std::vector<std::string> m_known_domains{};
+    std::set<std::string> m_known_domains{};
 
 private:
     void getSrcDstIpAddresses(const void* src_ip, const void* dst_ip);

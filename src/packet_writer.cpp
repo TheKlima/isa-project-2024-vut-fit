@@ -8,16 +8,11 @@
 
 void Packet_writer::processDomainName(std::string& domain_name)
 {
-    for(const auto& i : m_known_domains)
+    if(!m_known_domains.contains(domain_name))
     {
-        if(domain_name.find(i) != std::string::npos)
-        {
-            return;
-        }
+        m_domains_file << domain_name << std::endl;
+        m_known_domains.insert(domain_name);
     }
-    
-    m_domains_file << domain_name << std::endl;
-    m_known_domains.push_back(domain_name);
 }
 
 void Packet_writer::advancePtrToDnsQuestion(const u_char** packet_data) const

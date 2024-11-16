@@ -27,8 +27,7 @@ private:
         AAAA = 28,
         SRV = 33
     };
-
-
+    
     void advancePtrToUdpHeader(const u_char** packet_data) const;
     void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
     void printDnsRecordType(Dns_record_type dns_record_type) const;
