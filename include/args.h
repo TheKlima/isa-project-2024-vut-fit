@@ -18,6 +18,7 @@ public:
      * @brief Constructs an object (assigns some values to its private members) based on the program arguments
      *
      * @param argc number of the program arguments + 1 (program's executable)
+     * @param argv pointer to the array of the program arguments
      */
     Args(int argc, char** argv);
     
