@@ -1,3 +1,11 @@
+/**
+ * DNS monitor
+ * 
+ * @brief Implementation of the Dns_monitor class
+ * @file dns-monitor.cpp
+ * @author Andrii Klymenko <xklyme00>
+ */
+
 #include "dns-monitor.h"
 
 Dns_monitor::Dns_monitor(int argc, char **argv)
@@ -36,8 +44,6 @@ Dns_monitor::~Dns_monitor()
     }
 }
 
-// preparation before processing DNS packets
-// inspired by: https://vichargrave.github.io/programming/develop-a-packet-sniffer-with-libpcap/#process-packets
 void Dns_monitor::createPcapHandle()
 {
     bpf_u_int32 net_mask{0};
@@ -130,6 +136,6 @@ void Dns_monitor::run()
 
 void Dns_monitor::signalHandler(int sig)
 {
-    (void)sig;
+    (void)sig; // suppressing compiler's "unused parameter" warning
     throw Dns_monitor_exception{""};
 }
