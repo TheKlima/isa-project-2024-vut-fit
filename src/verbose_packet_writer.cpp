@@ -86,8 +86,13 @@ void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint
         {
             return;
         }
-
-        std::cout << "[Question Section]" << std::endl << domain_name << ". IN ";
+        
+        if(i == questions_count)
+        {
+            std::cout << "[Question Section]" << std::endl;
+        }
+        
+        std::cout << domain_name << ". IN ";
         printDnsRecordType(static_cast<Dns_record_type> (qtype));
         std::cout << '\n';
         printDnsSectionsDelimiter();
