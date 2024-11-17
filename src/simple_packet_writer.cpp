@@ -47,7 +47,7 @@ void Simple_packet_writer::processDnsQuestions(const u_char** packet_data, uint1
     for(int i{questions_count}; i != 0; --i)
     {
         (void) is_domains_file;
-        std::string domain_name{getQuestionDomainName(packet_data)};
+        std::string domain_name{getDomainName(packet_data)};
         processDomainName(domain_name);
         (*packet_data) += 4;
     }

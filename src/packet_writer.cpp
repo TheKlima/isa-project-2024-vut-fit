@@ -15,12 +15,22 @@ void Packet_writer::processDomainName(std::string& domain_name)
     }
 }
 
+void Packet_writer::fillRecordIp(const u_char** packet_data, bool is_ipv4)
+{
+    int address_family{is_ipv4 ? AF_INET : AF_INET6};
+
+    if(!inet_ntop(address_family, *packet_data, m_record_ip, INET6_ADDRSTRLEN))
+    {
+        throw Dns_monitor_exception{"Error! inet_ntop() has failed."};
+    }
+}
+
 void Packet_writer::advancePtrToDnsQuestion(const u_char** packet_data) const
 {
     (*packet_data) += 12;
 }
 
-std::string Packet_writer::getQuestionDomainName(const u_char** packet_data) const
+std::string Packet_writer::getDomainName(const u_char** packet_data) const
 {
     std::string domain_name{};
 
@@ -107,15 +117,15 @@ std::string Packet_writer::getTimestamp(struct pcap_pkthdr* packet_header) const
     return std::string{timestamp_buffer};
 }
 
-void Packet_writer::printIpAddress(const char* ip_address) const
-{
-    if(!ip_address)
-    {
-        throw Dns_monitor_exception{"Error! inet_ntop() has failed."};
-    }
-    
-    std::cout << ip_address << std::flush;
-}
+//void Packet_writer::printIpAddress(const char* ip_address) const
+//{
+//    if(!ip_address)
+//    {
+//        throw Dns_monitor_exception{"Error! inet_ntop() has failed."};
+//    }
+//    
+//    std::cout << ip_address << std::flush;
+//}
 
 void Packet_writer::processIpHeader(const u_char* packet_data)
 {

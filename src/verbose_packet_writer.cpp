@@ -8,17 +8,57 @@ Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, cons
 
 }
 
-//void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
-//                               bool is_translations_file, std::string_view section_name)
-//{
-//    for(int i{records_count}; i != 0; --i)
-//    {
-//        if(i == records_count)
-//        {
-//            std::cout << '[' << section_name << " Section]" << std::endl;
-//        }
-//    }
-//}
+uint16_t Verbose_packet_writer::get16BitUint(const u_char** packet_data) const
+{
+    uint16_t value = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
+    (*packet_data) += 2;
+    return value;
+}
+
+void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
+                               bool is_translations_file, std::string_view section_name)
+{
+    for(int i{records_count}; i != 0; --i)
+    {
+        std::string domain_name{getDomainName(packet_data)};
+
+        uint16_t qtype = get16BitUint(packet_data);
+        uint16_t qclass = get16BitUint(packet_data);
+
+        if(i == records_count)
+        {
+            std::cout << '[' << section_name << " Section]" << std::endl;
+        }
+
+        if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
+        {
+            continue;
+        }
+
+        uint32_t ttl = ntohs(*(reinterpret_cast<const uint32_t*>(*packet_data)));
+        (*packet_data) += 4;
+
+        uint16_t rdlength = get16BitUint(packet_data);
+
+        switch(qtype)
+        {
+            case static_cast<uint16_t> (Dns_record_type::A):
+                break;
+            case static_cast<uint16_t> (Dns_record_type::NS):
+                break;
+            case static_cast<uint16_t> (Dns_record_type::CNAME):
+                break;
+            case static_cast<uint16_t> (Dns_record_type::SOA):
+                break;
+            case static_cast<uint16_t> (Dns_record_type::MX):
+                break;
+            case static_cast<uint16_t> (Dns_record_type::AAAA):
+                break;
+            default: // SRV
+                break;
+        }
+    }
+}
 
 bool Verbose_packet_writer::isSupportedDnsClass(uint16_t dns_class) const
 {
@@ -81,27 +121,24 @@ void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint
 {
     for(int i{questions_count}; i != 0; --i)
     {
-        std::string domain_name{getQuestionDomainName(packet_data)};
+        std::string domain_name{getDomainName(packet_data)};
 
         if(is_domains_file)
         {
             processDomainName(domain_name);
         }
 
-        uint16_t qtype = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
-        (*packet_data) += 2;
-
-        uint16_t qclass = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
-        (*packet_data) += 2;
-
-        if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
-        {
-            continue;
-        }
+        uint16_t qtype = get16BitUint(packet_data);
+        uint16_t qclass = get16BitUint(packet_data);
         
         if(i == questions_count)
         {
             std::cout << "[Question Section]" << std::endl;
+        }
+
+        if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
+        {
+            continue;
         }
         
         std::cout << domain_name << ". IN ";

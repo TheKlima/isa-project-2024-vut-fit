@@ -16,19 +16,10 @@ protected:
     virtual void printSrcDstIpAddresses() const override;
     virtual void printDnsHeader() const override;
     virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file) override;
-//    virtual void processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
-//                                   bool is_translations_file, std::string_view section_name) override;
+    virtual void processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
+                                   bool is_translations_file, std::string_view section_name) override;
     
 private:
-    enum class Dns_record_type {
-        A = 1,
-        NS = 2,
-        CNAME = 5,
-        SOA = 6,
-        MX = 15,
-        AAAA = 28,
-        SRV = 33
-    };
     
     void advancePtrToUdpHeader(const u_char** packet_data) const;
     void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
@@ -36,6 +27,7 @@ private:
     void printDnsSectionsDelimiter() const;
     bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
     bool isSupportedDnsClass(uint16_t dns_class) const;
+    uint16_t get16BitUint(const u_char** packet_data) const;
 };
 
 #endif // VERBOSE_PACKET_WRITER_H
