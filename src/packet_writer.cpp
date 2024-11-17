@@ -8,10 +8,10 @@
 
 void Packet_writer::processDomainName(std::string& domain_name)
 {
-    if(!m_known_domains.contains(domain_name))
+    if(!m_known_domains_translations.contains(domain_name))
     {
         m_domains_file << domain_name << std::endl;
-        m_known_domains.insert(domain_name);
+        m_known_domains_translations[domain_name] = "";
     }
 }
 

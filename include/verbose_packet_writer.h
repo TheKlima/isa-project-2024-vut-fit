@@ -16,6 +16,8 @@ protected:
     virtual void printSrcDstIpAddresses() const override;
     virtual void printDnsHeader() const override;
     virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file) override;
+//    virtual void processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
+//                                   bool is_translations_file, std::string_view section_name) override;
     
 private:
     enum class Dns_record_type {

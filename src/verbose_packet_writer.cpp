@@ -8,6 +8,18 @@ Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, cons
 
 }
 
+//void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
+//                               bool is_translations_file, std::string_view section_name)
+//{
+//    for(int i{records_count}; i != 0; --i)
+//    {
+//        if(i == records_count)
+//        {
+//            std::cout << '[' << section_name << " Section]" << std::endl;
+//        }
+//    }
+//}
+
 bool Verbose_packet_writer::isSupportedDnsClass(uint16_t dns_class) const
 {
     return dns_class == 1;
@@ -84,7 +96,7 @@ void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint
 
         if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
         {
-            return;
+            continue;
         }
         
         if(i == questions_count)

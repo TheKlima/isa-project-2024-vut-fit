@@ -9,7 +9,7 @@
 #include <netinet/ether.h>         // For Ethernet header (struct ether_header)
 #include <iostream>
 #include <fstream>
-#include <set>
+#include <unordered_map>
 
 class Packet_writer {
 public:
@@ -37,6 +37,8 @@ protected:
     virtual void printSrcDstIpAddresses() const = 0;
     virtual void printDnsHeader() const = 0;
     virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file) = 0;
+//    virtual void processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
+//                                   bool is_translations_file, std::string_view section_name) = 0;
 
     bool m_is_ipv4{};
     char m_src_ip[INET6_ADDRSTRLEN]{};
@@ -47,7 +49,7 @@ protected:
     std::ofstream m_translations_file{};
 
     bool m_is_constructor_err{};
-    std::set<std::string> m_known_domains{};
+    std::unordered_map<std::string, std::string> m_known_domains_translations{};
 
 private:
     void getSrcDstIpAddresses(const void* src_ip, const void* dst_ip);
