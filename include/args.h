@@ -24,41 +24,41 @@ public:
     // "Getters"
     
     /**
-     * @brief object's m_packets_source private member "getter"
+     * @brief Object's private member m_packets_source "getter"
      *
-     * @return value of the object's m_packets_source private member
+     * @return Value of the object's private member m_packets_source
      */
     const char* getPacketsSource() const;
     
     /**
-     * @brief object's m_domains_file_name private member "getter"
+     * @brief Object's private member m_domains_file_name "getter"
      *
-     * @return value of the object's m_domains_file_name private member
+     * @return Value of the object's private member m_domains_file_name
      */
     const char* getDomainsFileName() const;
     
     /**
-     * @brief object's m_translations_file_name private member "getter"
+     * @brief Object's private member m_translations_file_name "getter"
      *
-     * @return value of the object's m_translations_file_name private member
+     * @return Value of the object's private member m_translations_file_name
      */
     const char* getTranslationsFileName() const;
     
     /**
-     * @brief object's m_is_verbose private member "getter"
+     * @brief Object's private member m_is_verbose "getter"
      *
-     * @return value of the object's m_is_verbose private member
+     * @return Value of the object's private member m_is_verbose
      */
     bool getIsVerbose() const;
     
     /**
-     * @brief object's m_sniffing_from_interface private member "getter"
+     * @brief Object's private member "getter" m_sniffing_from_interface
      *
-     * @return value of the object's m_sniffing_from_interface private member
+     * @return Value of the object's private member m_sniffing_from_interface
      */
     bool getSniffingFromInterface() const;
     
-    // End of "Getters"
+    // End of the "Getters"
     
 private:
     const char* m_packets_source{};         // either an interface name or pcap file name
