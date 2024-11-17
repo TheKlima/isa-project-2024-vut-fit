@@ -52,6 +52,8 @@ Args::Args(int argc, char** argv)
     }
 }
 
+// "Getters"
+
 const char* Args::getPacketsSource() const
 {
     return m_packets_source;
@@ -76,3 +78,5 @@ bool Args::getSniffingFromInterface() const
 {
     return m_sniffing_from_interface;
 }
+
+// End of the "Getters"
