@@ -1,7 +1,7 @@
 /**
  * DNS monitor
  * 
- * @brief Object representing program arguments
+ * @brief Definition of the object representing program arguments
  * @file args.h
  * @author Andrii Klymenko <xklyme00>
  */
@@ -9,6 +9,9 @@
 #ifndef ARGS_H
 #define ARGS_H
 
+/**
+ * @brief Object representing program arguments
+ */
 class Args {
 public:
     /**
