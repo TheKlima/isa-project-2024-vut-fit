@@ -1,9 +1,18 @@
+/**
+ * DNS monitor
+ * 
+ * @brief Implementation of the Dns_header class
+ * @file dns-header.cpp
+ * @author Andrii Klymenko <xklyme00>
+ */
+
 #include "dns-header.h"
 
 void Dns_header::fill(const u_char* dns_header)
 {
     setId(ntohs(*(reinterpret_cast<const uint16_t*>(dns_header))));
 
+    // second header's 16 bits sequence
     uint16_t flags{ntohs(*(reinterpret_cast<const uint16_t*>(dns_header + 2)))};
 
     setQr((flags >> 15) & 1);
@@ -94,7 +103,7 @@ uint16_t Dns_header::getArcount() const
     return m_arcount;
 }
 
-// End of 'Getters'
+// End of the 'Getters'
 
 // Private 'Setters'
 
@@ -168,5 +177,4 @@ void Dns_header::setArcount(uint16_t arcount)
     m_arcount = arcount;
 }
 
-
-// End of private 'Setters'
+// End of the private 'Setters'
