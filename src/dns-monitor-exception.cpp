@@ -5,7 +5,7 @@
 // Login: xklyme00
 // Date: 22.4.2024
 
-#include "dns_monitor_exception.h"
+#include "dns-monitor-exception.h"
 
 Dns_monitor_exception::Dns_monitor_exception(std::string_view explanation)
     :

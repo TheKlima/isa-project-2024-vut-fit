@@ -1,9 +1,10 @@
-// File: dns_monitor_exception.h
-// Subject: ISA
-// Project: #1 (DNS monitor)
-// Author: Andrii Klymenko
-// Login: xklyme00
-// Date: 22.4.2024
+/**
+ * DNS monitor
+ * 
+ * @brief Definition of the class representing program's exception
+ * @file args.h
+ * @author Andrii Klymenko <xklyme00>
+ */
 
 #ifndef DNS_MONITOR_EXCEPTION_H
 #define DNS_MONITOR_EXCEPTION_H
