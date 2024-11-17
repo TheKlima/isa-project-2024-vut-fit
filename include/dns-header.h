@@ -19,6 +19,8 @@
  */
 class Dns_header {
 private:
+    const u_char* m_ptr{};  // pointer to the DNS header
+    
     uint16_t m_id{};      // message identifier
     uint8_t m_qr{};       // specifies whether this message is a query (0), or a response (1)
     uint8_t m_opcode{};   // specifies kind of query in the message
@@ -245,6 +247,13 @@ public:
      * @return Value of the object's private member m_arcount
      */
     uint16_t getArcount() const;
+
+    /**
+     * @brief Object's private member "getter" m_ptr
+     *
+     * @return Value of the object's private member m_ptr
+     */
+    const u_char* getPtr() const;
     
     // End of the "Getters"
 };

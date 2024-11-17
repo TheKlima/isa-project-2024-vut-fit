@@ -10,7 +10,7 @@
 #define DNS_MONITOR_H
 
 #include "args.h"
-#include "dns_monitor_exception.h"
+#include "dns-monitor-exception.h"
 #include "packet_writer.h"
 #include <pcap/pcap.h>
 #include <cstring>

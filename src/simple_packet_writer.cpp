@@ -7,6 +7,54 @@ Simple_packet_writer::Simple_packet_writer(const char* domains_file_name, const 
 
 }
 
+void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
+                                              bool is_translations_file, std::string_view section_name)
+{
+    (void) section_name;
+    (void) is_domains_file;
+    
+    for(int i{records_count}; i != 0; --i)
+    {
+        std::string domain_name{getDomainName(packet_data)};
+
+        uint16_t qtype = get16BitUint(packet_data);
+        uint16_t qclass = get16BitUint(packet_data);
+        
+        if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
+        {
+            continue;
+        }
+        
+        (*packet_data) += 4;
+
+        uint16_t rdlength = get16BitUint(packet_data);
+        (void) rdlength;
+        
+        bool is_record_A{false};
+        
+        switch(qtype)
+        {
+            case static_cast<uint16_t> (Dns_record_type::A):
+            case static_cast<uint16_t> (Dns_record_type::AAAA):
+                is_record_A = (qtype == static_cast<uint16_t> (Dns_record_type::A));
+                processRecordA(packet_data, domain_name, is_record_A, is_domains_file, is_translations_file);
+                skipRecordIp(packet_data, is_record_A);
+                break;
+            case static_cast<uint16_t> (Dns_record_type::NS):
+                break;
+            case static_cast<uint16_t> (Dns_record_type::CNAME):
+                break;
+            case static_cast<uint16_t> (Dns_record_type::SOA):
+                break;
+            case static_cast<uint16_t> (Dns_record_type::MX):
+                break;
+            default: // SRV
+                break;
+        }
+    }
+}
+
+
 void Simple_packet_writer::skipDnsQuestion(const u_char** packet_data) const
 {
     while(**packet_data != '\0')
@@ -23,10 +71,10 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
 {
     (void) is_translations_file; // TODO remove it
     printTimestamp(getTimestamp(packet_header));
-    std::cout << ' ' << std::flush;              // TODO make a function from it
+    std::cout << ' ';              // TODO make a function from it
     processIpHeader(packet_data);
     printSrcDstIpAddresses();
-    std::cout << ' ' << std::flush;
+    std::cout << ' ';
     advancePtrToDnsHeader(&packet_data);
     m_dns_header.fill(packet_data);
     printDnsHeader();
@@ -40,6 +88,8 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     {
         skipDnsQuestion(&packet_data);
     }
+
+    processDnsRecords(&packet_data, m_dns_header.getAncount(), is_domains_file, is_translations_file, "Answer");
 }
 
 void Simple_packet_writer::processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file)

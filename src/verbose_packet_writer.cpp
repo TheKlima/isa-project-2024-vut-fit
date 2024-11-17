@@ -2,22 +2,17 @@
 #include <netinet/udp.h>
 
 Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, const char* translations_file_name)
-        :
-        Packet_writer(domains_file_name, translations_file_name)
+    :
+    Packet_writer(domains_file_name, translations_file_name),
+    m_sections_delimiter{"===================="}
 {
 
-}
-
-uint16_t Verbose_packet_writer::get16BitUint(const u_char** packet_data) const
-{
-    uint16_t value = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
-    (*packet_data) += 2;
-    return value;
 }
 
 void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
                                bool is_translations_file, std::string_view section_name)
 {
+    (void) is_domains_file;
     for(int i{records_count}; i != 0; --i)
     {
         std::string domain_name{getDomainName(packet_data)};
@@ -39,10 +34,20 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
         (*packet_data) += 4;
 
         uint16_t rdlength = get16BitUint(packet_data);
+        (void) rdlength;
+        
+        std::cout << domain_name <<  ". " << ttl << " IN " << getDnsRecordType(static_cast<Dns_record_type> (qtype)) << ' ';
+        
+        bool is_record_A{false};
 
         switch(qtype)
         {
             case static_cast<uint16_t> (Dns_record_type::A):
+            case static_cast<uint16_t> (Dns_record_type::AAAA):
+                is_record_A = (qtype == static_cast<uint16_t> (Dns_record_type::A));
+                processRecordA(packet_data, domain_name, is_record_A, is_domains_file, is_translations_file);
+                std::cout << getRecordIp() << std::endl;
+                skipRecordIp(packet_data, is_record_A);
                 break;
             case static_cast<uint16_t> (Dns_record_type::NS):
                 break;
@@ -52,68 +57,36 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
                 break;
             case static_cast<uint16_t> (Dns_record_type::MX):
                 break;
-            case static_cast<uint16_t> (Dns_record_type::AAAA):
-                break;
             default: // SRV
                 break;
         }
     }
+
+    if(records_count != 0)
+    {
+        std::cout << m_sections_delimiter << '\n' << std::endl;
+    }
 }
 
-bool Verbose_packet_writer::isSupportedDnsClass(uint16_t dns_class) const
-{
-    return dns_class == 1;
-}
-
-void Verbose_packet_writer::printDnsSectionsDelimiter() const
-{
-    std::cout << "====================" << std::endl;
-}
-
-void Verbose_packet_writer::printDnsRecordType(Dns_record_type dns_record_type) const
+std::string Verbose_packet_writer::getDnsRecordType(Dns_record_type dns_record_type) const
 {
     switch (dns_record_type)
     {
         case Dns_record_type::A:
-            std::cout << "A";
-            break;
+            return "A";
         case Dns_record_type::NS:
-            std::cout << "NS";
-            break;
+            return "NS";
         case Dns_record_type::CNAME:
-            std::cout << "CNAME";
-            break;
+            return "CNAME";
         case Dns_record_type::SOA:
-            std::cout << "SOA";
-            break;
+            return "SOA";
         case Dns_record_type::MX:
-            std::cout << "MX";
-            break;
+            return "MX";
         case Dns_record_type::AAAA:
-            std::cout << "AAAA";
-            break;
+            return "AAAA";
 
         default: // SRV
-            std::cout << "SRV";
-            break;
-    }
-}
-
-bool Verbose_packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type) const
-{
-    switch (dns_record_type)
-    {
-        case static_cast<uint16_t> (Dns_record_type::A):
-        case static_cast<uint16_t> (Dns_record_type::NS):
-        case static_cast<uint16_t> (Dns_record_type::CNAME):
-        case static_cast<uint16_t> (Dns_record_type::SOA):
-        case static_cast<uint16_t> (Dns_record_type::MX):
-        case static_cast<uint16_t> (Dns_record_type::AAAA):
-        case static_cast<uint16_t> (Dns_record_type::SRV):
-            return true;
-            
-        default:
-            return false;
+            return "SRV";
     }
 }
 
@@ -141,12 +114,10 @@ void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint
             continue;
         }
         
-        std::cout << domain_name << ". IN ";
-        printDnsRecordType(static_cast<Dns_record_type> (qtype));
-        std::cout << '\n';
-        printDnsSectionsDelimiter();
-        std::cout << '\n';
+        std::cout << domain_name << ". IN " << getDnsRecordType(static_cast<Dns_record_type> (qtype)) << std::endl;
     }
+
+    std::cout << m_sections_delimiter << '\n' << std::endl;
 }
 
 void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
@@ -164,6 +135,7 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     printDnsHeader();
     advancePtrToDnsQuestion(&packet_data);
     processDnsQuestions(&packet_data, m_dns_header.getQdcount(), is_domains_file);
+    processDnsRecords(&packet_data, m_dns_header.getAncount(), is_domains_file, is_translations_file, "Answer");
 }
 
 void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const

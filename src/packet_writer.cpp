@@ -11,15 +11,88 @@ void Packet_writer::processDomainName(std::string& domain_name)
     if(!m_known_domains_translations.contains(domain_name))
     {
         m_domains_file << domain_name << std::endl;
-        m_known_domains_translations[domain_name] = "";
+        m_known_domains_translations[domain_name] = std::set<std::string>{};
     }
 }
 
-void Packet_writer::fillRecordIp(const u_char** packet_data, bool is_ipv4)
+bool Packet_writer::isSupportedDnsClass(uint16_t dns_class) const
+{
+    return dns_class == 1;
+}
+
+bool Packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type) const
+{
+    switch (dns_record_type)
+    {
+        case static_cast<uint16_t> (Dns_record_type::A):
+        case static_cast<uint16_t> (Dns_record_type::NS):
+        case static_cast<uint16_t> (Dns_record_type::CNAME):
+        case static_cast<uint16_t> (Dns_record_type::SOA):
+        case static_cast<uint16_t> (Dns_record_type::MX):
+        case static_cast<uint16_t> (Dns_record_type::AAAA):
+        case static_cast<uint16_t> (Dns_record_type::SRV):
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+uint16_t Packet_writer::get16BitUint(const u_char** packet_data) const
+{
+    uint16_t value = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
+    (*packet_data) += 2;
+    return value;
+}
+
+
+void Packet_writer::skipRecordIp(const u_char** packet_data, bool is_ipv4) const
+{
+    (*packet_data) += is_ipv4 ? 4 : 16;
+}
+
+const char* Packet_writer::getRecordIp() const
+{
+    return m_record_ip;
+}
+
+void Packet_writer::processRecordA(const u_char** packet_data, std::string& domain_name, bool is_ipv4, bool is_domains_file,
+                                   bool is_translations_file)
+{
+    fillRecordIp(*packet_data, is_ipv4);
+    
+    if(is_domains_file || is_translations_file)
+    {
+        if(!m_known_domains_translations.contains(domain_name))
+        {
+            m_known_domains_translations[domain_name] = std::set<std::string>{m_record_ip};
+
+            if(is_domains_file)
+            {
+                m_domains_file << domain_name << std::endl;
+            }
+            
+            if(is_translations_file)
+            {
+                m_translations_file << domain_name << ' ' << m_record_ip << std::endl;
+            }
+        }
+        else
+        {
+            if(!m_known_domains_translations[domain_name].contains(m_record_ip))
+            {
+                m_known_domains_translations[domain_name].insert(m_record_ip);
+                m_translations_file << domain_name << ' ' << m_record_ip << std::endl;
+            }
+        }
+    }
+}
+
+void Packet_writer::fillRecordIp(const u_char* packet_data, bool is_ipv4)
 {
     int address_family{is_ipv4 ? AF_INET : AF_INET6};
 
-    if(!inet_ntop(address_family, *packet_data, m_record_ip, INET6_ADDRSTRLEN))
+    if(!inet_ntop(address_family, packet_data, m_record_ip, INET6_ADDRSTRLEN))
     {
         throw Dns_monitor_exception{"Error! inet_ntop() has failed."};
     }
@@ -33,20 +106,48 @@ void Packet_writer::advancePtrToDnsQuestion(const u_char** packet_data) const
 std::string Packet_writer::getDomainName(const u_char** packet_data) const
 {
     std::string domain_name{};
+    const u_char* original_data = *packet_data;
+    bool is_compressed = false;
 
     while(true)
     {
-        uint8_t label_length{**packet_data};
-        ++(*packet_data);
+        uint8_t label_length = **packet_data;
+
+        // Check for pointer (two leading bits set to 1)
+        if((label_length & 0xC0) == 0xC0)
+        {
+            if(!is_compressed)
+            {
+                // First time encountering a pointer; mark original position to restore later
+                original_data = *packet_data + 2;
+                is_compressed = true;
+            }
+
+            // Read the 14-bit offset
+            uint16_t offset = ntohs(*reinterpret_cast<const uint16_t*>(*packet_data)) & 0x3FFF;
+            *packet_data = m_dns_header.getPtr() + offset;
+            label_length = **packet_data;
+        }
         
+        // Append label to domain name
+        ++(*packet_data);  // Move past the length byte
         domain_name.append(reinterpret_cast<const char*>(*packet_data), label_length);
         (*packet_data) += label_length;
-        
-        if(**packet_data == '\0')
+
+        if(**packet_data == 0)
         {
-            ++(*packet_data);
+            if(is_compressed)
+            {
+                *packet_data = original_data;
+            }
+            else
+            {
+                ++(*packet_data);
+            }
+
             return domain_name;
         }
+
 
         domain_name.push_back('.');
     }
@@ -116,16 +217,6 @@ std::string Packet_writer::getTimestamp(struct pcap_pkthdr* packet_header) const
     
     return std::string{timestamp_buffer};
 }
-
-//void Packet_writer::printIpAddress(const char* ip_address) const
-//{
-//    if(!ip_address)
-//    {
-//        throw Dns_monitor_exception{"Error! inet_ntop() has failed."};
-//    }
-//    
-//    std::cout << ip_address << std::flush;
-//}
 
 void Packet_writer::processIpHeader(const u_char* packet_data)
 {

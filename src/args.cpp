@@ -8,7 +8,7 @@
 
 #include "args.h"
 #include "getopt.h"
-#include "dns_monitor_exception.h"
+#include "dns-monitor-exception.h"
 
 Args::Args(int argc, char** argv)
     :

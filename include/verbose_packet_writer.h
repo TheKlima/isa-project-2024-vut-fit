@@ -23,11 +23,10 @@ private:
     
     void advancePtrToUdpHeader(const u_char** packet_data) const;
     void printSrcDstUdpPorts(const struct udphdr* udp_header) const;
-    void printDnsRecordType(Dns_record_type dns_record_type) const;
-    void printDnsSectionsDelimiter() const;
-    bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
-    bool isSupportedDnsClass(uint16_t dns_class) const;
-    uint16_t get16BitUint(const u_char** packet_data) const;
+//    void printDnsSectionsDelimiter() const;
+    std::string getDnsRecordType(Dns_record_type dns_record_type) const;
+    
+    const char* m_sections_delimiter{};
 };
 
 #endif // VERBOSE_PACKET_WRITER_H

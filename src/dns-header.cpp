@@ -10,6 +10,8 @@
 
 void Dns_header::fill(const u_char* dns_header)
 {
+    m_ptr = dns_header;
+    
     setId(ntohs(*(reinterpret_cast<const uint16_t*>(dns_header))));
 
     // second header's 16 bits sequence
@@ -101,6 +103,11 @@ uint16_t Dns_header::getNscount() const
 uint16_t Dns_header::getArcount() const
 {
     return m_arcount;
+}
+
+const u_char* Dns_header::getPtr() const
+{
+    return m_ptr;
 }
 
 // End of the 'Getters'
