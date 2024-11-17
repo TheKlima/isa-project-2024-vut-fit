@@ -1,3 +1,11 @@
+/**
+ * DNS monitor
+ * 
+ * @brief Implementation of the Args class
+ * @file args.cpp
+ * @author Andrii Klymenko <xklyme00>
+ */
+
 #include "args.h"
 #include "getopt.h"
 #include "dns_monitor_exception.h"
@@ -17,7 +25,7 @@ Args::Args(int argc, char** argv)
         {
             case 'i':
             case 'p':
-                if(m_packets_source != nullptr)
+                if(m_packets_source != nullptr) // if both an interface name and a pcap file name were specified
                 {
                     throw Dns_monitor_exception{"You must specify either an interface name or PCAP file name but not both."};
                 }
