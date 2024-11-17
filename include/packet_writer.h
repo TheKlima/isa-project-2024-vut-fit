@@ -36,7 +36,7 @@ protected:
     virtual void printTimestamp(std::string_view timestamp) const = 0;
     virtual void printSrcDstIpAddresses() const = 0;
     virtual void printDnsHeader() const = 0;
-    virtual void processDnsQuestion(const u_char** packet_data, bool is_domains_file) = 0;
+    virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file) = 0;
 
     bool m_is_ipv4{};
     char m_src_ip[INET6_ADDRSTRLEN]{};

@@ -65,31 +65,34 @@ bool Verbose_packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type) c
     }
 }
 
-void Verbose_packet_writer::processDnsQuestion(const u_char **packet_data, bool is_domains_file)
+void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint16_t questions_count, bool is_domains_file)
 {
-    std::string domain_name{getQuestionDomainName(packet_data)};
-    
-    if(is_domains_file)
+    for(int i{questions_count}; i != 0; --i)
     {
-        processDomainName(domain_name);
-    }
+        std::string domain_name{getQuestionDomainName(packet_data)};
 
-    uint16_t qtype = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
-    (*packet_data) += 2;
+        if(is_domains_file)
+        {
+            processDomainName(domain_name);
+        }
 
-    uint16_t qclass = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
-    (*packet_data) += 2;
-    
-    if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
-    {
-        return;
+        uint16_t qtype = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
+        (*packet_data) += 2;
+
+        uint16_t qclass = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
+        (*packet_data) += 2;
+
+        if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
+        {
+            return;
+        }
+
+        std::cout << "[Question Section]" << std::endl << domain_name << ". IN ";
+        printDnsRecordType(static_cast<Dns_record_type> (qtype));
+        std::cout << '\n';
+        printDnsSectionsDelimiter();
+        std::cout << '\n';
     }
-    
-    std::cout << "[Question Section]" << std::endl << domain_name << ". IN ";
-    printDnsRecordType(static_cast<Dns_record_type> (qtype));
-    std::cout << '\n';
-    printDnsSectionsDelimiter();
-    std::cout << '\n';
 }
 
 void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
@@ -106,7 +109,7 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     m_dns_header.fill(packet_data);
     printDnsHeader();
     advancePtrToDnsQuestion(&packet_data);
-    processDnsQuestion(&packet_data, is_domains_file);
+    processDnsQuestions(&packet_data, m_dns_header.getQdcount(), is_domains_file);
 }
 
 void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const

@@ -34,7 +34,7 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
 
     if(is_domains_file)
     {
-        processDnsQuestion(&packet_data, true);
+        processDnsQuestions(&packet_data, m_dns_header.getQdcount(), true);
     }
     else
     {
@@ -42,12 +42,15 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     }
 }
 
-void Simple_packet_writer::processDnsQuestion(const u_char** packet_data, bool is_domains_file)
+void Simple_packet_writer::processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file)
 {
-    (void) is_domains_file;
-    std::string domain_name{getQuestionDomainName(packet_data)};
-    processDomainName(domain_name);
-    (*packet_data) += 4;
+    for(int i{questions_count}; i != 0; --i)
+    {
+        (void) is_domains_file;
+        std::string domain_name{getQuestionDomainName(packet_data)};
+        processDomainName(domain_name);
+        (*packet_data) += 4;
+    }
 }
 
 void Simple_packet_writer::printTimestamp(std::string_view timestamp) const

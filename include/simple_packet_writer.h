@@ -14,7 +14,7 @@ protected:
     virtual void printTimestamp(std::string_view timestamp) const override;
     virtual void printSrcDstIpAddresses() const override;
     virtual void printDnsHeader() const override;
-    virtual void processDnsQuestion(const u_char** packet_data, bool is_domains_file) override;
+    virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file) override;
     
 private:
     void skipDnsQuestion(const u_char** packet_data) const;
