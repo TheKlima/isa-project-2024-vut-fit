@@ -66,6 +66,23 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
                 std::cout << domain_name << std::endl;
                 break;
             case static_cast<uint16_t> (Dns_record_type::SOA):
+                domain_name = getDomainName(packet_data);
+
+                if(is_domains_file)
+                {
+                    processDomainName(domain_name);
+                }
+
+                std::cout << domain_name << ' ';
+
+                domain_name = getDomainName(packet_data);
+                std::cout << domain_name << ' ' << ntohl(*(reinterpret_cast<const uint32_t*>(*packet_data))) << ' ' <<
+                    ntohl(*(reinterpret_cast<const uint32_t*>(*packet_data + 4))) << ' ' <<
+                    ntohl(*(reinterpret_cast<const uint32_t*>(*packet_data + 8))) << ' ' <<
+                    ntohl(*(reinterpret_cast<const uint32_t*>(*packet_data + 12))) << std::endl;
+
+                (*packet_data) += 16;
+                
                 break;
             case static_cast<uint16_t> (Dns_record_type::MX):
                 std::cout << get16BitUint(packet_data) << ' ';

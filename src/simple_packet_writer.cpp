@@ -57,6 +57,16 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
                 std::cout << domain_name << std::endl;
                 break;
             case static_cast<uint16_t> (Dns_record_type::SOA):
+                domain_name = getDomainName(packet_data);
+
+                if(is_domains_file)
+                {
+                    processDomainName(domain_name);
+                }
+                
+                domain_name = getDomainName(packet_data);
+                (*packet_data) += 16;
+
                 break;
             case static_cast<uint16_t> (Dns_record_type::MX):
                 (*packet_data) += 2;
