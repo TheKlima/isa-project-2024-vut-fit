@@ -12,7 +12,11 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <netinet/in.h>
+//#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>   // For sockaddr
+#include <arpa/inet.h>    // For ntohs
+#include <netinet/if_ether.h>
 
 /**
  * @brief Class representing DNS packet's header

@@ -1,4 +1,4 @@
-#include "verbose_packet_writer.h"
+#include "verbose-packet-writer.h"
 #include <netinet/udp.h>
 
 Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, const char* translations_file_name)
@@ -15,8 +15,8 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
     {
         std::string domain_name{getDomainName(packet_data)};
 
-        uint16_t qtype = get16BitUint(packet_data);
-        uint16_t qclass = get16BitUint(packet_data);
+        auto qtype {getUint<uint16_t>(packet_data)};
+        auto qclass {getUint<uint16_t>(packet_data)};
 
         if(i == records_count)
         {
@@ -33,11 +33,9 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
             processDomainName(domain_name);
         }
 
-        uint32_t ttl = ntohs(*(reinterpret_cast<const uint32_t*>(*packet_data)));
-        (*packet_data) += 4;
-
-        uint16_t rdlength = get16BitUint(packet_data);
-        (void) rdlength;
+        auto ttl {getUint<uint32_t>(packet_data)};
+        
+        (*packet_data) += 2;
         
         std::cout << domain_name <<  ". " << ttl << " IN " << getDnsRecordType(static_cast<Dns_record_type> (qtype)) << ' ';
         
@@ -61,7 +59,7 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
                     processDomainName(domain_name);
                 }
 
-                std::cout << domain_name << std::endl;
+                std::cout << domain_name << '.' << std::endl;
                 break;
             case static_cast<uint16_t> (Dns_record_type::SOA):
                 domain_name = getDomainName(packet_data);
@@ -71,23 +69,16 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
                     processDomainName(domain_name);
                 }
 
-                std::cout << domain_name << ' ';
-
-                domain_name = getDomainName(packet_data);
-                std::cout << domain_name << ' ' << ntohl(*(reinterpret_cast<const uint32_t*>(*packet_data))) << ' ' <<
-                    ntohl(*(reinterpret_cast<const uint32_t*>(*packet_data + 4))) << ' ' <<
-                    ntohl(*(reinterpret_cast<const uint32_t*>(*packet_data + 8))) << ' ' <<
-                    ntohl(*(reinterpret_cast<const uint32_t*>(*packet_data + 12))) << std::endl;
-
-                (*packet_data) += 16;
+                std::cout << domain_name << ". " << getDomainName(packet_data) << ". " << getUint<uint32_t>(packet_data)
+                        << ' ' << getUint<uint32_t>(packet_data) << ' ' << getUint<uint32_t>(packet_data) << ' ' <<
+                        getUint<uint32_t>(packet_data) << ' ' << getUint<uint32_t>(packet_data) << ' ' << std::endl;
                 
                 break;
             case static_cast<uint16_t> (Dns_record_type::MX):
-                std::cout << get16BitUint(packet_data) << ' ';
-                domain_name = getDomainName(packet_data);
-                std::cout << domain_name << std::endl;
+                std::cout << getUint<uint16_t>(packet_data) << ' ' << getDomainName(packet_data) << '.' << std::endl;
                 break;
             default: // SRV
+                
                 break;
         }
     }
@@ -131,8 +122,8 @@ void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint
             processDomainName(domain_name);
         }
 
-        uint16_t qtype = get16BitUint(packet_data);
-        uint16_t qclass = get16BitUint(packet_data);
+        auto qtype {getUint<uint16_t>(packet_data)};
+        auto qclass {getUint<uint16_t>(packet_data)};
         
         if(i == questions_count)
         {
@@ -163,6 +154,8 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     advancePtrToDnsQuestion(&packet_data);
     processDnsQuestions(&packet_data, m_dns_header.getQdcount());
     processDnsRecords(&packet_data, m_dns_header.getAncount(), "Answer");
+    processDnsRecords(&packet_data, m_dns_header.getNscount(), "Authority");
+    processDnsRecords(&packet_data, m_dns_header.getArcount(), "Additional");
 }
 
 void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const
@@ -185,10 +178,16 @@ void Verbose_packet_writer::printSrcDstIpAddresses() const
     std::cout << "SrcIP: " << m_src_ip << "\nDstIP: " << m_dst_ip << std::endl;
 }
 
+//void Verbose_packet_writer::printSrcDstUdpPorts(const struct udphdr* udp_header)
+//{
+//    std::cout << "SrcPort: UDP/" << ntohs(udp_header->source) << "\nDstPort: UDP/" << ntohs(udp_header->dest) << std::endl;
+//}
+
 void Verbose_packet_writer::printSrcDstUdpPorts(const struct udphdr* udp_header)
 {
-    std::cout << "SrcPort: UDP/" << ntohs(udp_header->source) << "\nDstPort: UDP/" << ntohs(udp_header->dest) << std::endl;
+    std::cout << "SrcPort: UDP/" << ntohs(udp_header->uh_sport) << "\nDstPort: UDP/" << ntohs(udp_header->uh_dport) << std::endl;
 }
+
 
 void Verbose_packet_writer::printDnsHeader() const
 {

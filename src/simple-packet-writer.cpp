@@ -1,4 +1,4 @@
-#include "simple_packet_writer.h"
+#include "simple-packet-writer.h"
 
 Simple_packet_writer::Simple_packet_writer(const char* domains_file_name, const char* translations_file_name)
         :
@@ -15,8 +15,8 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
     {
         std::string domain_name{getDomainName(packet_data)};
 
-        uint16_t qtype = get16BitUint(packet_data);
-        uint16_t qclass = get16BitUint(packet_data);
+        auto qtype {getUint<uint16_t>(packet_data)};
+        auto qclass {getUint<uint16_t>(packet_data)};
         
         if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
         {
@@ -27,11 +27,8 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
         {
             processDomainName(domain_name);
         }
-
-        (*packet_data) += 4;
-
-        uint16_t rdlength = get16BitUint(packet_data);
-        (void) rdlength;
+        
+        (*packet_data) += 6;
         
         bool is_record_A{false};
         
@@ -52,7 +49,6 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
                     processDomainName(domain_name);
                 }
                 
-                std::cout << domain_name << std::endl;
                 break;
             case static_cast<uint16_t> (Dns_record_type::SOA):
                 domain_name = getDomainName(packet_data);
@@ -62,8 +58,8 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
                     processDomainName(domain_name);
                 }
                 
-                domain_name = getDomainName(packet_data);
-                (*packet_data) += 16;
+                getDomainName(packet_data);
+                (*packet_data) += 20;
 
                 break;
             case static_cast<uint16_t> (Dns_record_type::MX):
@@ -76,8 +72,7 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
     }
 }
 
-
-void Simple_packet_writer::skipDnsQuestion(const u_char** packet_data) const
+void Simple_packet_writer::skipDnsQuestion(const u_char** packet_data)
 {
     while(**packet_data != '\0')
     {
@@ -110,6 +105,8 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     }
 
     processDnsRecords(&packet_data, m_dns_header.getAncount(), "Answer");
+    processDnsRecords(&packet_data, m_dns_header.getNscount(), "Authority");
+    processDnsRecords(&packet_data, m_dns_header.getArcount(), "Additional");
 }
 
 void Simple_packet_writer::processDnsQuestions(const u_char** packet_data, uint16_t questions_count)

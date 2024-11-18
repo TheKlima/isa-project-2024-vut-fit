@@ -1,7 +1,7 @@
 #ifndef SIMPLE_PACKET_WRITER_H
 #define SIMPLE_PACKET_WRITER_H
 
-#include "packet_writer.h"
+#include "packet-writer.h"
 
 class Simple_packet_writer : public Packet_writer {
 public:
@@ -17,7 +17,7 @@ protected:
     void processDnsRecords(const u_char** packet_data, uint16_t records_count, std::string_view section_name) override;
 
 private:
-    void skipDnsQuestion(const u_char** packet_data) const;
+    static void skipDnsQuestion(const u_char** packet_data);
 };
 
 #endif // SIMPLE_PACKET_WRITER_H

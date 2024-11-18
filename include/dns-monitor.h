@@ -11,7 +11,7 @@
 
 #include "args.h"
 #include "dns-monitor-exception.h"
-#include "packet_writer.h"
+#include "packet-writer.h"
 #include <pcap/pcap.h>
 #include <cstring>
 #include <iostream>

@@ -1,6 +1,6 @@
-#include "packet_writer.h"
-#include "verbose_packet_writer.h"
-#include "simple_packet_writer.h"
+#include "packet-writer.h"
+#include "verbose-packet-writer.h"
+#include "simple-packet-writer.h"
 #include <ctime>                    // For localtime() and strftime()
 #include <pcap/pcap.h>
 #include <netinet/ip6.h>
@@ -51,14 +51,6 @@ bool Packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type)
             return false;
     }
 }
-
-uint16_t Packet_writer::get16BitUint(const u_char** packet_data)
-{
-    uint16_t value = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
-    (*packet_data) += 2;
-    return value;
-}
-
 
 void Packet_writer::skipRecordIp(const u_char** packet_data, bool is_ipv4)
 {
@@ -164,7 +156,6 @@ std::string Packet_writer::getDomainName(const u_char** packet_data) const
 
             return domain_name;
         }
-
 
         domain_name.push_back('.');
     }
@@ -273,15 +264,6 @@ void Packet_writer::getSrcDstIpAddresses(const void* src_ip, const void* dst_ip)
         throw Dns_monitor_exception{"Error! inet_ntop() has failed."};
     }
 }
-
-//void Packet_writer::printSrcIp() const
-//{
-//    std::cout << m_src_ip << std::flush;
-//}
-//void Packet_writer::printDstIp() const
-//{
-//    std::cout << m_dst_ip << std::flush;
-//}
 
 int Packet_writer::getIpHeaderSize(const u_char* packet_data) const
 {

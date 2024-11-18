@@ -6,7 +6,10 @@
 #include <new>                     // For std::nothrow
 #include <cstdlib>                 // For u_char
 #include <arpa/inet.h>             // For inet_ntop
-#include <netinet/ether.h>         // For Ethernet header (struct ether_header)
+//#include <netinet/ether.h>         // For Ethernet header (struct ether_header)
+#include <sys/socket.h>   // For sockaddr
+#include <netinet/if_ether.h>
+
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
@@ -29,7 +32,8 @@ protected:
     bool isDomainsFile() const;
     bool isTranslationsFile() const;
     static std::string getTimestamp(struct pcap_pkthdr* packet_header);
-    static uint16_t get16BitUint(const u_char** packet_data);
+//    static uint16_t get16BitUint(const u_char** packet_data);
+//    static uint32_t get32BitUint(const u_char** packet_data);
     static bool isSupportedDnsRecordType(uint16_t dns_record_type);
     static bool isSupportedDnsClass(uint16_t dns_class);
     static void skipRecordIp(const u_char** packet_data, bool is_ipv4);
@@ -46,6 +50,17 @@ protected:
     virtual void printDnsHeader() const = 0;
     virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count) = 0;
     virtual void processDnsRecords(const u_char** packet_data, uint16_t records_count, std::string_view section_name) = 0;
+
+    template <typename T>
+    T getUint(const u_char** packet_data)
+    {
+//    T value = ntohs(*(reinterpret_cast<const T*>(*packet_data)));
+        T value = (sizeof(T) == 2) ? ntohs(*(reinterpret_cast<const T*>(*packet_data)))
+                                   : ntohl(*(reinterpret_cast<const T*>(*packet_data)));
+        (*packet_data) += sizeof(T);
+        return value;
+    }
+
 
     char m_src_ip[INET6_ADDRSTRLEN]{};
     char m_dst_ip[INET6_ADDRSTRLEN]{};
