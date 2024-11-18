@@ -24,7 +24,12 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
         {
             continue;
         }
-        
+
+        if(is_domains_file)
+        {
+            processDomainName(domain_name);
+        }
+
         (*packet_data) += 4;
 
         uint16_t rdlength = get16BitUint(packet_data);
@@ -41,12 +46,21 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
                 skipRecordIp(packet_data, is_record_A);
                 break;
             case static_cast<uint16_t> (Dns_record_type::NS):
-                break;
             case static_cast<uint16_t> (Dns_record_type::CNAME):
+                domain_name = getDomainName(packet_data);
+
+                if(is_domains_file)
+                {
+                    processDomainName(domain_name);
+                }
+                
+                std::cout << domain_name << std::endl;
                 break;
             case static_cast<uint16_t> (Dns_record_type::SOA):
                 break;
             case static_cast<uint16_t> (Dns_record_type::MX):
+                (*packet_data) += 2;
+                getDomainName(packet_data);
                 break;
             default: // SRV
                 break;

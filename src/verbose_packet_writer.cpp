@@ -29,6 +29,11 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
         {
             continue;
         }
+        
+        if(is_domains_file && qtype)
+        {
+            processDomainName(domain_name);
+        }
 
         uint32_t ttl = ntohs(*(reinterpret_cast<const uint32_t*>(*packet_data)));
         (*packet_data) += 4;
@@ -50,12 +55,22 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
                 skipRecordIp(packet_data, is_record_A);
                 break;
             case static_cast<uint16_t> (Dns_record_type::NS):
-                break;
             case static_cast<uint16_t> (Dns_record_type::CNAME):
+                domain_name = getDomainName(packet_data);
+
+                if(is_domains_file)
+                {
+                    processDomainName(domain_name);
+                }
+
+                std::cout << domain_name << std::endl;
                 break;
             case static_cast<uint16_t> (Dns_record_type::SOA):
                 break;
             case static_cast<uint16_t> (Dns_record_type::MX):
+                std::cout << get16BitUint(packet_data) << ' ';
+                domain_name = getDomainName(packet_data);
+                std::cout << domain_name << std::endl;
                 break;
             default: // SRV
                 break;
