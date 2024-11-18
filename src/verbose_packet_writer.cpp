@@ -9,10 +9,8 @@ Verbose_packet_writer::Verbose_packet_writer(const char* domains_file_name, cons
 
 }
 
-void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
-                               bool is_translations_file, std::string_view section_name)
+void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, std::string_view section_name)
 {
-    (void) is_domains_file;
     for(int i{records_count}; i != 0; --i)
     {
         std::string domain_name{getDomainName(packet_data)};
@@ -30,7 +28,7 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
             continue;
         }
         
-        if(is_domains_file && qtype)
+        if(isDomainsFile())
         {
             processDomainName(domain_name);
         }
@@ -50,7 +48,7 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
             case static_cast<uint16_t> (Dns_record_type::A):
             case static_cast<uint16_t> (Dns_record_type::AAAA):
                 is_record_A = (qtype == static_cast<uint16_t> (Dns_record_type::A));
-                processRecordA(packet_data, domain_name, is_record_A, is_domains_file, is_translations_file);
+                processRecordA(packet_data, domain_name, is_record_A);
                 std::cout << getRecordIp() << std::endl;
                 skipRecordIp(packet_data, is_record_A);
                 break;
@@ -58,7 +56,7 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
             case static_cast<uint16_t> (Dns_record_type::CNAME):
                 domain_name = getDomainName(packet_data);
 
-                if(is_domains_file)
+                if(isDomainsFile())
                 {
                     processDomainName(domain_name);
                 }
@@ -68,7 +66,7 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
             case static_cast<uint16_t> (Dns_record_type::SOA):
                 domain_name = getDomainName(packet_data);
 
-                if(is_domains_file)
+                if(isDomainsFile())
                 {
                     processDomainName(domain_name);
                 }
@@ -100,7 +98,7 @@ void Verbose_packet_writer::processDnsRecords(const u_char** packet_data, uint16
     }
 }
 
-std::string Verbose_packet_writer::getDnsRecordType(Dns_record_type dns_record_type) const
+std::string Verbose_packet_writer::getDnsRecordType(Dns_record_type dns_record_type)
 {
     switch (dns_record_type)
     {
@@ -122,13 +120,13 @@ std::string Verbose_packet_writer::getDnsRecordType(Dns_record_type dns_record_t
     }
 }
 
-void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint16_t questions_count, bool is_domains_file)
+void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint16_t questions_count)
 {
     for(int i{questions_count}; i != 0; --i)
     {
         std::string domain_name{getDomainName(packet_data)};
 
-        if(is_domains_file)
+        if(isDomainsFile())
         {
             processDomainName(domain_name);
         }
@@ -152,11 +150,8 @@ void Verbose_packet_writer::processDnsQuestions(const u_char **packet_data, uint
     std::cout << m_sections_delimiter << '\n' << std::endl;
 }
 
-void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
-                                        bool is_translations_file)
+void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data)
 {
-    (void) is_domains_file; // TODO remove it
-    (void) is_translations_file; // TODO remove it
     printTimestamp(getTimestamp(packet_header));
     processIpHeader(packet_data);
     printSrcDstIpAddresses();
@@ -166,8 +161,8 @@ void Verbose_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const
     m_dns_header.fill(packet_data);
     printDnsHeader();
     advancePtrToDnsQuestion(&packet_data);
-    processDnsQuestions(&packet_data, m_dns_header.getQdcount(), is_domains_file);
-    processDnsRecords(&packet_data, m_dns_header.getAncount(), is_domains_file, is_translations_file, "Answer");
+    processDnsQuestions(&packet_data, m_dns_header.getQdcount());
+    processDnsRecords(&packet_data, m_dns_header.getAncount(), "Answer");
 }
 
 void Verbose_packet_writer::advancePtrToDnsHeader(const u_char** packet_data) const
@@ -190,7 +185,7 @@ void Verbose_packet_writer::printSrcDstIpAddresses() const
     std::cout << "SrcIP: " << m_src_ip << "\nDstIP: " << m_dst_ip << std::endl;
 }
 
-void Verbose_packet_writer::printSrcDstUdpPorts(const struct udphdr* udp_header) const
+void Verbose_packet_writer::printSrcDstUdpPorts(const struct udphdr* udp_header)
 {
     std::cout << "SrcPort: UDP/" << ntohs(udp_header->source) << "\nDstPort: UDP/" << ntohs(udp_header->dest) << std::endl;
 }

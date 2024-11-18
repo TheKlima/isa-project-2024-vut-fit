@@ -15,8 +15,7 @@
 class Packet_writer {
 public:
     static Packet_writer* create(bool is_verbose, const char* domains_file_name, const char* translations_file_name);
-    virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
-            bool is_translations_file) = 0;
+    virtual void printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data) = 0;
     virtual ~Packet_writer();
     bool getIsConstructorErr() const;
     
@@ -24,29 +23,29 @@ public:
     
 protected:
     Packet_writer(const char* domains_file_name, const char* translations_file_name);
-    std::string getTimestamp(struct pcap_pkthdr* packet_header) const;
     std::string getDomainName(const u_char** packet_data) const;
     const char* getRecordIp() const;
     int getIpHeaderSize(const u_char* packet_data) const;
-    uint16_t get16BitUint(const u_char** packet_data) const;
-    bool isSupportedDnsRecordType(uint16_t dns_record_type) const;
-    bool isSupportedDnsClass(uint16_t dns_class) const;
+    bool isDomainsFile() const;
+    bool isTranslationsFile() const;
+    static std::string getTimestamp(struct pcap_pkthdr* packet_header);
+    static uint16_t get16BitUint(const u_char** packet_data);
+    static bool isSupportedDnsRecordType(uint16_t dns_record_type);
+    static bool isSupportedDnsClass(uint16_t dns_class);
+    static void skipRecordIp(const u_char** packet_data, bool is_ipv4);
+    static void advancePtrToDnsQuestion(const u_char** packet_data);
     //    void printIpAddress(const char* ip_address) const;
     void processIpHeader(const u_char* packet_data);
     void processDomainName(std::string& domain_name);
-    void printSrcIp() const;
-    void printDstIp() const;
-    void advancePtrToDnsQuestion(const u_char** packet_data) const;
-    void processRecordA(const u_char** packet_data, std::string& domain_name, bool is_ipv4, bool is_domains_file,
-                        bool is_translations_file);
-    void skipRecordIp(const u_char** packet_data, bool is_ipv4) const;
+//    void printSrcIp() const;
+//    void printDstIp() const;
+    void processRecordA(const u_char** packet_data, std::string& domain_name, bool is_ipv4);
     virtual void advancePtrToDnsHeader(const u_char** packet_data) const = 0;
     virtual void printTimestamp(std::string_view timestamp) const = 0;
     virtual void printSrcDstIpAddresses() const = 0;
     virtual void printDnsHeader() const = 0;
-    virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file) = 0;
-    virtual void processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
-                                   bool is_translations_file, std::string_view section_name) = 0;
+    virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count) = 0;
+    virtual void processDnsRecords(const u_char** packet_data, uint16_t records_count, std::string_view section_name) = 0;
 
     char m_src_ip[INET6_ADDRSTRLEN]{};
     char m_dst_ip[INET6_ADDRSTRLEN]{};
@@ -71,8 +70,8 @@ protected:
 
 private:
     void getSrcDstIpAddresses(const void* src_ip, const void* dst_ip);
-    void createOutputFile(std::ofstream& output_file, const char* const file_name);
-    void closeOutputFile(std::ofstream& output_file);
+    static void createOutputFile(std::ofstream& output_file, const char* const file_name);
+    static void closeOutputFile(std::ofstream& output_file);
     void fillRecordIp(const u_char* packet_data, bool is_ipv4);
 
     bool m_is_ipv4{};

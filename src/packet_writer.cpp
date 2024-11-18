@@ -8,19 +8,33 @@
 
 void Packet_writer::processDomainName(std::string& domain_name)
 {
-    if(!m_known_domains_translations.contains(domain_name))
+    if((isDomainsFile() || isTranslationsFile()) && !m_known_domains_translations.contains(domain_name))
     {
-        m_domains_file << domain_name << std::endl;
+        if(isDomainsFile())
+        {
+            m_domains_file << domain_name << std::endl;
+        }
+        
         m_known_domains_translations[domain_name] = std::set<std::string>{};
     }
 }
 
-bool Packet_writer::isSupportedDnsClass(uint16_t dns_class) const
+bool Packet_writer::isDomainsFile() const
 {
-    return dns_class == 1;
+    return m_domains_file.is_open();
 }
 
-bool Packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type) const
+bool Packet_writer::isTranslationsFile() const
+{
+    return m_translations_file.is_open();
+}
+
+bool Packet_writer::isSupportedDnsClass(uint16_t dns_class)
+{
+    return dns_class == 1; // IN
+}
+
+bool Packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type)
 {
     switch (dns_record_type)
     {
@@ -38,7 +52,7 @@ bool Packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type) const
     }
 }
 
-uint16_t Packet_writer::get16BitUint(const u_char** packet_data) const
+uint16_t Packet_writer::get16BitUint(const u_char** packet_data)
 {
     uint16_t value = ntohs(*(reinterpret_cast<const uint16_t*>(*packet_data)));
     (*packet_data) += 2;
@@ -46,7 +60,7 @@ uint16_t Packet_writer::get16BitUint(const u_char** packet_data) const
 }
 
 
-void Packet_writer::skipRecordIp(const u_char** packet_data, bool is_ipv4) const
+void Packet_writer::skipRecordIp(const u_char** packet_data, bool is_ipv4)
 {
     (*packet_data) += is_ipv4 ? 4 : 16;
 }
@@ -56,23 +70,22 @@ const char* Packet_writer::getRecordIp() const
     return m_record_ip;
 }
 
-void Packet_writer::processRecordA(const u_char** packet_data, std::string& domain_name, bool is_ipv4, bool is_domains_file,
-                                   bool is_translations_file)
+void Packet_writer::processRecordA(const u_char** packet_data, std::string& domain_name, bool is_ipv4)
 {
     fillRecordIp(*packet_data, is_ipv4);
     
-    if(is_domains_file || is_translations_file)
+    if(isDomainsFile() || isTranslationsFile())
     {
         if(!m_known_domains_translations.contains(domain_name))
         {
             m_known_domains_translations[domain_name] = std::set<std::string>{m_record_ip};
 
-            if(is_domains_file)
+            if(isDomainsFile())
             {
                 m_domains_file << domain_name << std::endl;
             }
             
-            if(is_translations_file)
+            if(isTranslationsFile())
             {
                 m_translations_file << domain_name << ' ' << m_record_ip << std::endl;
             }
@@ -82,7 +95,11 @@ void Packet_writer::processRecordA(const u_char** packet_data, std::string& doma
             if(!m_known_domains_translations[domain_name].contains(m_record_ip))
             {
                 m_known_domains_translations[domain_name].insert(m_record_ip);
-                m_translations_file << domain_name << ' ' << m_record_ip << std::endl;
+                
+                if(isTranslationsFile())
+                {
+                    m_translations_file << domain_name << ' ' << m_record_ip << std::endl;
+                }
             }
         }
     }
@@ -98,7 +115,7 @@ void Packet_writer::fillRecordIp(const u_char* packet_data, bool is_ipv4)
     }
 }
 
-void Packet_writer::advancePtrToDnsQuestion(const u_char** packet_data) const
+void Packet_writer::advancePtrToDnsQuestion(const u_char** packet_data)
 {
     (*packet_data) += 12;
 }
@@ -106,12 +123,12 @@ void Packet_writer::advancePtrToDnsQuestion(const u_char** packet_data) const
 std::string Packet_writer::getDomainName(const u_char** packet_data) const
 {
     std::string domain_name{};
-    const u_char* original_data = *packet_data;
-    bool is_compressed = false;
+    const u_char* original_data{*packet_data};
+    bool is_compressed{false};
 
     while(true)
     {
-        uint8_t label_length = **packet_data;
+        uint8_t label_length{**packet_data};
 
         // Check for pointer (two leading bits set to 1)
         if((label_length & 0xC0) == 0xC0)
@@ -203,7 +220,7 @@ Packet_writer* Packet_writer::create(bool is_verbose, const char* domains_file_n
     return new Simple_packet_writer{domains_file_name, translations_file_name};
 }
 
-std::string Packet_writer::getTimestamp(struct pcap_pkthdr* packet_header) const
+std::string Packet_writer::getTimestamp(struct pcap_pkthdr* packet_header)
 {
     struct tm* local_time{localtime(&(packet_header->ts.tv_sec))};
 
@@ -257,14 +274,14 @@ void Packet_writer::getSrcDstIpAddresses(const void* src_ip, const void* dst_ip)
     }
 }
 
-void Packet_writer::printSrcIp() const
-{
-    std::cout << m_src_ip << std::flush;
-}
-void Packet_writer::printDstIp() const
-{
-    std::cout << m_dst_ip << std::flush;
-}
+//void Packet_writer::printSrcIp() const
+//{
+//    std::cout << m_src_ip << std::flush;
+//}
+//void Packet_writer::printDstIp() const
+//{
+//    std::cout << m_dst_ip << std::flush;
+//}
 
 int Packet_writer::getIpHeaderSize(const u_char* packet_data) const
 {

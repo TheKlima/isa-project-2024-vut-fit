@@ -5,6 +5,7 @@ test_dns
 
 # PCAP files
 *.pcapng
+*.pcap
 
 # CMake's generated stuff
 .idea

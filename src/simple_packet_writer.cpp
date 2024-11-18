@@ -7,11 +7,9 @@ Simple_packet_writer::Simple_packet_writer(const char* domains_file_name, const 
 
 }
 
-void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, bool is_domains_file,
-                                              bool is_translations_file, std::string_view section_name)
+void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, std::string_view section_name)
 {
     (void) section_name;
-    (void) is_domains_file;
     
     for(int i{records_count}; i != 0; --i)
     {
@@ -25,7 +23,7 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
             continue;
         }
 
-        if(is_domains_file)
+        if(isDomainsFile())
         {
             processDomainName(domain_name);
         }
@@ -42,14 +40,14 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
             case static_cast<uint16_t> (Dns_record_type::A):
             case static_cast<uint16_t> (Dns_record_type::AAAA):
                 is_record_A = (qtype == static_cast<uint16_t> (Dns_record_type::A));
-                processRecordA(packet_data, domain_name, is_record_A, is_domains_file, is_translations_file);
+                processRecordA(packet_data, domain_name, is_record_A);
                 skipRecordIp(packet_data, is_record_A);
                 break;
             case static_cast<uint16_t> (Dns_record_type::NS):
             case static_cast<uint16_t> (Dns_record_type::CNAME):
                 domain_name = getDomainName(packet_data);
 
-                if(is_domains_file)
+                if(isDomainsFile())
                 {
                     processDomainName(domain_name);
                 }
@@ -59,7 +57,7 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
             case static_cast<uint16_t> (Dns_record_type::SOA):
                 domain_name = getDomainName(packet_data);
 
-                if(is_domains_file)
+                if(isDomainsFile())
                 {
                     processDomainName(domain_name);
                 }
@@ -90,10 +88,8 @@ void Simple_packet_writer::skipDnsQuestion(const u_char** packet_data) const
     (*packet_data) += 5;
 }
 
-void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data, bool is_domains_file,
-                                       bool is_translations_file)
+void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data)
 {
-    (void) is_translations_file; // TODO remove it
     printTimestamp(getTimestamp(packet_header));
     std::cout << ' ';              // TODO make a function from it
     processIpHeader(packet_data);
@@ -104,25 +100,29 @@ void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const 
     printDnsHeader();
     advancePtrToDnsQuestion(&packet_data);
 
-    if(is_domains_file)
+    if(isDomainsFile())
     {
-        processDnsQuestions(&packet_data, m_dns_header.getQdcount(), true);
+        processDnsQuestions(&packet_data, m_dns_header.getQdcount());
     }
     else
     {
         skipDnsQuestion(&packet_data);
     }
 
-    processDnsRecords(&packet_data, m_dns_header.getAncount(), is_domains_file, is_translations_file, "Answer");
+    processDnsRecords(&packet_data, m_dns_header.getAncount(), "Answer");
 }
 
-void Simple_packet_writer::processDnsQuestions(const u_char** packet_data, uint16_t questions_count, bool is_domains_file)
+void Simple_packet_writer::processDnsQuestions(const u_char** packet_data, uint16_t questions_count)
 {
     for(int i{questions_count}; i != 0; --i)
     {
-        (void) is_domains_file;
         std::string domain_name{getDomainName(packet_data)};
-        processDomainName(domain_name);
+        
+        if(isDomainsFile())
+        {
+            processDomainName(domain_name);
+        }
+        
         (*packet_data) += 4;
     }
 }

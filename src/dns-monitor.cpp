@@ -130,7 +130,7 @@ void Dns_monitor::run()
             throw Dns_monitor_exception{"Error! pcap_next_ex() has failed."};
         }
 
-        m_packet_writer->printPacket(packet_header, packet_data, m_args.getDomainsFileName(), m_args.getTranslationsFileName());
+        m_packet_writer->printPacket(packet_header, packet_data);
     }
 }
 
