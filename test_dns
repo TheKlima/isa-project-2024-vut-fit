@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Array of server domain names or IP addresses
+servers=("google.com" "facebook.com" "amazon.com" "apple.com" "microsoft.com" "yahoo.com" "youtube.com" "wikipedia.org" "twitter.com" "linkedin.com")
+
+# Loop through each server and perform nslookup
+for server in "${servers[@]}"
+do
+    echo "Performing nslookup for $server"
+    nslookup $server
+    echo ""
+done
