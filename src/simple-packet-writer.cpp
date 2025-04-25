@@ -1,3 +1,11 @@
+/**
+ * DNS monitor
+ * 
+ * @brief Implementation of the Simple_packet_writer class
+ * @file packet-writer.cpp
+ * @author Andrii Klymenko <xklyme00>
+ */
+
 #include "simple-packet-writer.h"
 
 Simple_packet_writer::Simple_packet_writer(const char* domains_file_name, const char* translations_file_name)
@@ -5,6 +13,35 @@ Simple_packet_writer::Simple_packet_writer(const char* domains_file_name, const 
         Packet_writer(domains_file_name, translations_file_name)
 {
 
+}
+
+void Simple_packet_writer::processNsCnameRecord(const u_char** packet_data, std::string& domain_name)
+{
+    domain_name = getDomainName(packet_data);
+    processDomainName(domain_name);
+}
+
+void Simple_packet_writer::processSoaRecord(const u_char** packet_data, std::string& domain_name)
+{
+    domain_name = getDomainName(packet_data);
+    processDomainName(domain_name);
+    getDomainName(packet_data);
+    (*packet_data) += 20;
+}
+
+void Simple_packet_writer::processMxRecord(const u_char** packet_data)
+{
+    (*packet_data) += 2;
+    getDomainName(packet_data);
+}
+
+void Simple_packet_writer::processSrvRecord(const u_char** packet_data, std::string& domain_name)
+{
+    (*packet_data) += 6;
+
+    domain_name = getDomainName(packet_data);
+
+    processDomainName(domain_name);
 }
 
 void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_t records_count, std::string_view section_name)
@@ -18,18 +55,17 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
         auto qtype {getUint<uint16_t>(packet_data)};
         auto qclass {getUint<uint16_t>(packet_data)};
         
+        (*packet_data) += 4;
+        auto rdlength{getUint<uint16_t>(packet_data)};
+
         if(!isSupportedDnsRecordType(qtype) || !isSupportedDnsClass(qclass))
         {
+            (*packet_data) += rdlength;
             continue;
         }
 
-        if(isDomainsFile())
-        {
-            processDomainName(domain_name);
-        }
-        
-        (*packet_data) += 6;
-        
+        processDomainName(domain_name);
+
         bool is_record_A{false};
         
         switch(qtype)
@@ -40,33 +76,22 @@ void Simple_packet_writer::processDnsRecords(const u_char** packet_data, uint16_
                 processRecordA(packet_data, domain_name, is_record_A);
                 skipRecordIp(packet_data, is_record_A);
                 break;
+                
             case static_cast<uint16_t> (Dns_record_type::NS):
             case static_cast<uint16_t> (Dns_record_type::CNAME):
-                domain_name = getDomainName(packet_data);
-
-                if(isDomainsFile())
-                {
-                    processDomainName(domain_name);
-                }
-                
+                processNsCnameRecord(packet_data, domain_name);
                 break;
+                
             case static_cast<uint16_t> (Dns_record_type::SOA):
-                domain_name = getDomainName(packet_data);
-
-                if(isDomainsFile())
-                {
-                    processDomainName(domain_name);
-                }
+                processSoaRecord(packet_data, domain_name);
+                break;
                 
-                getDomainName(packet_data);
-                (*packet_data) += 20;
-
-                break;
             case static_cast<uint16_t> (Dns_record_type::MX):
-                (*packet_data) += 2;
-                getDomainName(packet_data);
+                processMxRecord(packet_data);
                 break;
+
             default: // SRV
+                processSrvRecord(packet_data, domain_name);
                 break;
         }
     }
@@ -86,7 +111,7 @@ void Simple_packet_writer::skipDnsQuestion(const u_char** packet_data)
 void Simple_packet_writer::printPacket(struct pcap_pkthdr* packet_header, const u_char* packet_data)
 {
     printTimestamp(getTimestamp(packet_header));
-    std::cout << ' ';              // TODO make a function from it
+    std::cout << ' ';
     processIpHeader(packet_data);
     printSrcDstIpAddresses();
     std::cout << ' ';
@@ -115,12 +140,13 @@ void Simple_packet_writer::processDnsQuestions(const u_char** packet_data, uint1
     {
         std::string domain_name{getDomainName(packet_data)};
         
-        if(isDomainsFile())
+        auto qtype {getUint<uint16_t>(packet_data)};
+        auto qclass {getUint<uint16_t>(packet_data)};
+
+        if(isSupportedDnsRecordType(qtype) && isSupportedDnsClass(qclass))
         {
             processDomainName(domain_name);
         }
-        
-        (*packet_data) += 4;
     }
 }
 

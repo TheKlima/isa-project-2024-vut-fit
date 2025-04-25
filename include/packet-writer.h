@@ -1,3 +1,11 @@
+/**
+ * DNS monitor
+ * 
+ * @brief Definition of the abstract class representing DNS packets writer
+ * @file packet-writer.h
+ * @author Andrii Klymenko <xklyme00>
+ */
+
 #ifndef PACKET_WRITER_H
 #define PACKET_WRITER_H
 
@@ -6,8 +14,7 @@
 #include <new>                     // For std::nothrow
 #include <cstdlib>                 // For u_char
 #include <arpa/inet.h>             // For inet_ntop
-//#include <netinet/ether.h>         // For Ethernet header (struct ether_header)
-#include <sys/socket.h>   // For sockaddr
+#include <sys/socket.h>            // For sockaddr
 #include <netinet/if_ether.h>
 
 #include <iostream>
@@ -50,11 +57,14 @@ protected:
     virtual void printDnsHeader() const = 0;
     virtual void processDnsQuestions(const u_char** packet_data, uint16_t questions_count) = 0;
     virtual void processDnsRecords(const u_char** packet_data, uint16_t records_count, std::string_view section_name) = 0;
+    virtual void processNsCnameRecord(const u_char** packet_data, std::string& domain_name) = 0;
+    virtual void processSoaRecord(const u_char** packet_data, std::string& domain_name) = 0;
+    virtual void processMxRecord(const u_char** packet_data) = 0;
+    virtual void processSrvRecord(const u_char** packet_data, std::string& domain_name) = 0;
 
     template <typename T>
     T getUint(const u_char** packet_data)
     {
-//    T value = ntohs(*(reinterpret_cast<const T*>(*packet_data)));
         T value = (sizeof(T) == 2) ? ntohs(*(reinterpret_cast<const T*>(*packet_data)))
                                    : ntohl(*(reinterpret_cast<const T*>(*packet_data)));
         (*packet_data) += sizeof(T);

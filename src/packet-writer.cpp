@@ -1,3 +1,11 @@
+/**
+ * DNS monitor
+ * 
+ * @brief Implementation of the Packet_writer abstract class
+ * @file packet-writer.cpp
+ * @author Andrii Klymenko <xklyme00>
+ */
+
 #include "packet-writer.h"
 #include "verbose-packet-writer.h"
 #include "simple-packet-writer.h"
@@ -36,7 +44,7 @@ bool Packet_writer::isSupportedDnsClass(uint16_t dns_class)
 
 bool Packet_writer::isSupportedDnsRecordType(uint16_t dns_record_type)
 {
-    switch (dns_record_type)
+    switch(dns_record_type)
     {
         case static_cast<uint16_t> (Dns_record_type::A):
         case static_cast<uint16_t> (Dns_record_type::NS):
