@@ -1,12 +1,5 @@
 # My own stuff
 
-# Bash testing script
-test_dns
-
-# PCAP files
-*.pcapng
-*.pcap
-
 # CMake's generated stuff
 .idea
 cmake-build-debug
